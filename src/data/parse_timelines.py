@@ -36,35 +36,49 @@ def _extract_snapshot(frames: list[dict], target_min: int) -> dict | None:
     frame = frames[target_min]
     pf = frame.get("participantFrames", {})
 
-    blue, red = {}, {}
+    blue, red = {"kills": 0, "deaths": 0, "cs": 0, "gold": 0, "level": 0}, \
+                {"kills": 0, "deaths": 0, "cs": 0, "gold": 0, "level": 0}
+
+    # CS, gold, level viennent des participantFrames
     for pid_str, stats in pf.items():
         pid = int(pid_str)
         bucket = blue if pid in BLUE_IDS else red
-        bucket["kills"] = bucket.get("kills", 0) + stats.get("kills", 0)
-        bucket["deaths"] = bucket.get("deaths", 0) + stats.get("deaths", 0)
         cs = stats.get("minionsKilled", 0) + stats.get("jungleMinionsKilled", 0)
-        bucket["cs"] = bucket.get("cs", 0) + cs
-        bucket["gold"] = bucket.get("gold", 0) + stats.get("totalGold", 0)
-        bucket["level"] = bucket.get("level", 0) + stats.get("level", 0)
+        bucket["cs"] += cs
+        bucket["gold"] += stats.get("totalGold", 0)
+        bucket["level"] += stats.get("level", 0)
 
-    if not blue or not red:
+    if not pf:
         return None
 
-    # Objectifs cumulés jusqu'à target_min
+    # Kills et deaths viennent des events CHAMPION_KILL (pas dans participantFrames)
     towers_blue = towers_red = 0
     dragons_blue = dragons_red = 0
     heralds_blue = heralds_red = 0
     barons_blue = barons_red = 0
-    # Kills dans les 3 dernières minutes (momentum)
     kills_blue_recent = 0
 
     for f in frames[: target_min + 1]:
-        recent = f is frames[max(0, target_min - 2) : target_min + 1][-1]  # noqa: simplification below
+        is_recent = f in frames[max(0, target_min - 2): target_min + 1]
         for event in f.get("events", []):
             etype = event.get("type")
             killer_team = event.get("killerTeamId", event.get("teamId", 0))
 
-            if etype == "BUILDING_KILL":
+            if etype == "CHAMPION_KILL":
+                killer_id = event.get("killerId", 0)
+                victim_id = event.get("victimId", 0)
+                if killer_id in BLUE_IDS:
+                    blue["kills"] += 1
+                    if is_recent:
+                        kills_blue_recent += 1
+                elif killer_id in RED_IDS:
+                    red["kills"] += 1
+                if victim_id in BLUE_IDS:
+                    blue["deaths"] += 1
+                elif victim_id in RED_IDS:
+                    red["deaths"] += 1
+
+            elif etype == "BUILDING_KILL":
                 if killer_team == 100:
                     towers_blue += 1
                 else:
@@ -87,14 +101,6 @@ def _extract_snapshot(frames: list[dict], target_min: int) -> dict | None:
                         heralds_blue += 1
                     else:
                         heralds_red += 1
-
-    # Kills des 3 dernières minutes pour le momentum
-    for f in frames[max(0, target_min - 2) : target_min + 1]:
-        for event in f.get("events", []):
-            if event.get("type") == "CHAMPION_KILL":
-                killer_id = event.get("killerId", 0)
-                if killer_id in BLUE_IDS:
-                    kills_blue_recent += 1
 
     return {
         "kills_diff": blue["kills"] - red["kills"],

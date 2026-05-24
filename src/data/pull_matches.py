@@ -46,24 +46,17 @@ def _get(url: str, params: dict = None, retries: int = 3) -> dict:
 
 
 def fetch_master_puuids(queue: str = "RANKED_SOLO_5x5") -> list[str]:
-    """Retourne les PUUIDs des joueurs Master+ sur EUW."""
+    """Retourne les PUUIDs des joueurs Master+ sur EUW.
+    L'API retourne maintenant le puuid directement dans les entries — pas de requête intermédiaire.
+    """
     url = f"https://{REGION}.api.riotgames.com/lol/league/v4/masterleagues/by-queue/{queue}"
     data = _get(url)
     if not data:
         raise RuntimeError("Impossible de récupérer les Master.")
 
     entries = data.get("entries", [])
-    puuids = []
-    print(f"{len(entries)} joueurs Master trouvés, récupération des PUUIDs...")
-
-    for entry in tqdm(entries[:500]):  # on cap à 500 joueurs pour avoir assez de matchs
-        summoner_id = entry["summonerId"]
-        url_s = f"https://{REGION}.api.riotgames.com/lol/summoner/v4/summoners/{summoner_id}"
-        summoner = _get(url_s)
-        if summoner and "puuid" in summoner:
-            puuids.append(summoner["puuid"])
-        time.sleep(0.05)  # ~20 req/s
-
+    puuids = [e["puuid"] for e in entries if "puuid" in e]
+    print(f"{len(entries)} joueurs Master EUW trouvés → {len(puuids)} PUUIDs récupérés instantanément")
     return puuids
 
 

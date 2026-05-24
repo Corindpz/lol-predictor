@@ -1,0 +1,23 @@
+{
+  "run_id": "20260524_140557",
+  "date": "2026-05-24T14:05:57.553239",
+  "dataset": {
+    "n_samples": 415,
+    "n_features": 11,
+    "blue_win_rate": 0.46987951807228917
+  },
+  "models": [
+    {
+      "name": "Logistic Regression",
+      "accuracy": 0.7228915662650602,
+      "auc": 0.8321678321678321,
+      "log_loss": 0.5052601469751649
+    },
+    {
+      "name": "XGBoost (calibr\u00e9)",
+      "accuracy": 0.7228915662650602,
+      "auc": 0.8234265734265734,
+      "log_loss": 0.5457868805730416
+    }
+  ]
+}

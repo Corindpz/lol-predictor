@@ -7,6 +7,8 @@ Usage :
 """
 
 import argparse
+import json
+from datetime import datetime
 from pathlib import Path
 
 import joblib
@@ -30,6 +32,8 @@ from src.features.build_features import FEATURE_COLS, TARGET_COL
 
 MODELS_DIR = Path("models")
 MODELS_DIR.mkdir(exist_ok=True)
+RESULTS_DIR = Path("docs/results")
+RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def load_data(path: str) -> tuple[pd.DataFrame, pd.Series]:
@@ -79,15 +83,14 @@ def plot_results(results: list[dict], X_test: pd.DataFrame, y_test: pd.Series, X
     ax.set_title("Courbes de calibration")
     ax.legend()
 
-    # Feature importance (XGBoost)
+    # Feature importance (XGBoost — on accède au modèle de base via calibrated_classifiers_)
     xgb_result = next((r for r in results if "XGBoost" in r["name"]), None)
     if xgb_result:
         ax = axes[2]
-        base_model = xgb_result["model"]
-        if hasattr(base_model, "base_estimator"):
-            base_model = base_model.base_estimator
+        cal_model = xgb_result["model"]
+        base_estimator = cal_model.calibrated_classifiers_[0].estimator
         importances = pd.Series(
-            base_model.feature_importances_, index=FEATURE_COLS
+            base_estimator.feature_importances_, index=FEATURE_COLS
         ).sort_values()
         importances.plot(kind="barh", ax=ax, color="steelblue")
         ax.set_title("Feature importances (XGBoost)")
@@ -131,7 +134,6 @@ def train(input_path: str):
         learning_rate=0.05,
         subsample=0.8,
         colsample_bytree=0.8,
-        use_label_encoder=False,
         eval_metric="logloss",
         random_state=42,
     )
@@ -139,13 +141,28 @@ def train(input_path: str):
     cv_auc_xgb = cross_val_score(xgb, X_train, y_train, cv=cv, scoring="roc_auc").mean()
     print(f"  CV AUC-ROC : {cv_auc_xgb:.3f}")
 
-    # Calibration isotonique pour des probabilités fiables
-    xgb_cal = CalibratedClassifierCV(xgb, method="isotonic", cv=5)
+    # Calibration sigmoid (Platt scaling) — plus stable que isotonic sur petits datasets
+    xgb_cal = CalibratedClassifierCV(xgb, method="sigmoid", cv=5)
     xgb_cal.fit(X_train, y_train)
     results.append(evaluate("XGBoost (calibré)", xgb_cal, X_test, y_test))
     joblib.dump(xgb_cal, MODELS_DIR / "xgboost_final.pkl")
 
     plot_results(results, X_test, y_test, X)
+
+    # Export métriques JSON pour la documentation
+    run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+    metrics_export = {
+        "run_id": run_id,
+        "date": datetime.now().isoformat(),
+        "dataset": {"n_samples": len(X), "n_features": len(FEATURE_COLS), "blue_win_rate": float(y.mean())},
+        "models": [
+            {k: v for k, v in r.items() if k not in ("model", "y_proba")}
+            for r in results
+        ],
+    }
+    metrics_path = RESULTS_DIR / f"run_{run_id}.json"
+    metrics_path.write_text(json.dumps(metrics_export, indent=2))
+    print(f"Métriques exportées → {metrics_path}")
     print("\nModèles sauvegardés dans models/")
 
 
