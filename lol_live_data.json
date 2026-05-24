@@ -1,0 +1,328 @@
+{
+	"activePlayer": {
+		"abilities": {
+			"E": {
+				"abilityLevel": 5,
+				"displayName": "Dispersion des faibles",
+				"id": "SyndraE",
+				"rawDescription": "GeneratedTip_Spell_SyndraE_Description",
+				"rawDisplayName": "GeneratedTip_Spell_SyndraE_DisplayName"
+			},
+			"Passive": {
+				"displayName": "Transcendance",
+				"id": "SyndraPassive",
+				"rawDescription": "GeneratedTip_Passive_SyndraPassive_Description",
+				"rawDisplayName": "GeneratedTip_Passive_SyndraPassive_DisplayName"
+			},
+			"Q": {
+				"abilityLevel": 5,
+				"displayName": "Sphère noire",
+				"id": "SyndraQUpgrade",
+				"rawDescription": "GeneratedTip_Spell_SyndraQUpgrade_Description",
+				"rawDisplayName": "GeneratedTip_Spell_SyndraQUpgrade_DisplayName"
+			},
+			"R": {
+				"abilityLevel": 3,
+				"displayName": "Déchaînement de puissance",
+				"id": "SyndraR",
+				"rawDescription": "GeneratedTip_Spell_SyndraR_Description",
+				"rawDisplayName": "GeneratedTip_Spell_SyndraR_DisplayName"
+			},
+			"W": {
+				"abilityLevel": 5,
+				"displayName": "Force de la volonté",
+				"id": "SyndraW",
+				"rawDescription": "GeneratedTip_Spell_SyndraW_Description",
+				"rawDisplayName": "GeneratedTip_Spell_SyndraW_DisplayName"
+			}
+		},
+		"championStats": {
+			"abilityHaste": 20.0,
+			"abilityPower": 926.550048828125,
+			"armor": 143.0,
+			"armorPenetrationFlat": 0.0,
+			"armorPenetrationPercent": 1.0,
+			"attackDamage": 103.30000305175781,
+			"attackRange": 550.0,
+			"attackSpeed": 0.9330000281333923,
+			"bonusArmorPenetrationPercent": 1.0,
+			"bonusMagicPenetrationPercent": 1.0,
+			"critChance": 0.0,
+			"critDamage": 200.0,
+			"currentHealth": 2503.000244140625,
+			"healShieldPower": 0.0,
+			"healthRegenRate": 3.3400001525878908,
+			"lifeSteal": 0.0,
+			"magicLethality": 0.0,
+			"magicPenetrationFlat": 30.0,
+			"magicPenetrationPercent": 0.6000000238418579,
+			"magicResist": 52.10000228881836,
+			"maxHealth": 2503.000244140625,
+			"moveSpeed": 349.79998779296877,
+			"omnivamp": 0.0,
+			"physicalLethality": 0.0,
+			"physicalVamp": 0.0,
+			"resourceMax": 2010.0,
+			"resourceRegenRate": 4.320000171661377,
+			"resourceType": "MANA",
+			"resourceValue": 1728.9339599609376,
+			"spellVamp": 0.0,
+			"tenacity": 5.0
+		},
+		"currentGold": 63315.9765625,
+		"fullRunes": {
+			"generalRunes": [
+				{
+					"displayName": "Premier coup",
+					"id": 8369,
+					"rawDescription": "perk_tooltip_FirstStrike",
+					"rawDisplayName": "perk_displayname_FirstStrike"
+				},
+				{
+					"displayName": "Chaussures magiques",
+					"id": 8304,
+					"rawDescription": "perk_tooltip_MagicalFootwear",
+					"rawDisplayName": "perk_displayname_MagicalFootwear"
+				},
+				{
+					"displayName": "Livraison de biscuits",
+					"id": 8345,
+					"rawDescription": "perk_tooltip_BiscuitDelivery",
+					"rawDisplayName": "perk_displayname_BiscuitDelivery"
+				},
+				{
+					"displayName": "Savoir cosmique",
+					"id": 8347,
+					"rawDescription": "perk_tooltip_CosmicInsight",
+					"rawDisplayName": "perk_displayname_CosmicInsight"
+				},
+				{
+					"displayName": "Ruban de mana",
+					"id": 8226,
+					"rawDescription": "perk_tooltip_8226",
+					"rawDisplayName": "perk_displayname_8226"
+				},
+				{
+					"displayName": "Transcendance",
+					"id": 8210,
+					"rawDescription": "perk_tooltip_Transcendence",
+					"rawDisplayName": "perk_displayname_Transcendence"
+				}
+			],
+			"keystone": {
+				"displayName": "Premier coup",
+				"id": 8369,
+				"rawDescription": "perk_tooltip_FirstStrike",
+				"rawDisplayName": "perk_displayname_FirstStrike"
+			},
+			"primaryRuneTree": {
+				"displayName": "Inspiration",
+				"id": 8300,
+				"rawDescription": "perkstyle_tooltip_7203",
+				"rawDisplayName": "perkstyle_displayname_7203"
+			},
+			"secondaryRuneTree": {
+				"displayName": "Sorcellerie",
+				"id": 8200,
+				"rawDescription": "perkstyle_tooltip_7202",
+				"rawDisplayName": "perkstyle_displayname_7202"
+			},
+			"statRunes": [
+				{
+					"id": 5005,
+					"rawDescription": "perk_tooltip_StatModAttackSpeed"
+				},
+				{
+					"id": 5008,
+					"rawDescription": "perk_tooltip_StatModAdaptive"
+				},
+				{
+					"id": 5001,
+					"rawDescription": "perk_tooltip_StatModHealthScaling"
+				}
+			]
+		},
+		"level": 18,
+		"riotId": "AZNVR#1966",
+		"riotIdGameName": "AZNVR",
+		"riotIdTagLine": "1966",
+		"summonerName": "AZNVR#1966",
+		"teamRelativeColors": true
+	},
+	"allPlayers": [
+		{
+			"championName": "Syndra",
+			"isBot": false,
+			"isDead": false,
+			"items": [
+				{
+					"canUse": false,
+					"consumable": false,
+					"count": 1,
+					"displayName": "Onde orageuse",
+					"itemID": 4646,
+					"price": 800,
+					"rawDescription": "GeneratedTip_Item_4646_Description",
+					"rawDisplayName": "Item_4646_Name",
+					"slot": 0
+				},
+				{
+					"canUse": false,
+					"consumable": false,
+					"count": 1,
+					"displayName": "Écho de Luden",
+					"itemID": 6655,
+					"price": 450,
+					"rawDescription": "GeneratedTip_Item_6655_Description",
+					"rawDisplayName": "Item_6655_Name",
+					"slot": 1
+				},
+				{
+					"canUse": false,
+					"consumable": false,
+					"count": 1,
+					"displayName": "Flamme-ombre",
+					"itemID": 4645,
+					"price": 900,
+					"rawDescription": "GeneratedTip_Item_4645_Description",
+					"rawDisplayName": "Item_4645_Name",
+					"slot": 2
+				},
+				{
+					"canUse": false,
+					"consumable": false,
+					"count": 1,
+					"displayName": "Coiffe de Rabadon",
+					"itemID": 3089,
+					"price": 1100,
+					"rawDescription": "GeneratedTip_Item_3089_Description",
+					"rawDisplayName": "Item_3089_Name",
+					"slot": 3
+				},
+				{
+					"canUse": false,
+					"consumable": false,
+					"count": 1,
+					"displayName": "Bâton du vide",
+					"itemID": 3135,
+					"price": 1050,
+					"rawDescription": "GeneratedTip_Item_3135_Description",
+					"rawDisplayName": "Item_3135_Name",
+					"slot": 4
+				},
+				{
+					"canUse": true,
+					"consumable": false,
+					"count": 1,
+					"displayName": "Sablier de Zhonya",
+					"itemID": 3157,
+					"price": 450,
+					"rawDescription": "GeneratedTip_Item_3157_Description",
+					"rawDisplayName": "Item_3157_Name",
+					"slot": 5
+				}
+			],
+			"level": 18,
+			"position": "NONE",
+			"rawChampionName": "game_character_displayname_Syndra",
+			"rawSkinName": "game_character_skin_displayname_Syndra_2",
+			"respawnTimer": 0.0,
+			"riotId": "AZNVR#1966",
+			"riotIdGameName": "AZNVR",
+			"riotIdTagLine": "1966",
+			"runes": {
+				"keystone": {
+					"displayName": "Premier coup",
+					"id": 8369,
+					"rawDescription": "perk_tooltip_FirstStrike",
+					"rawDisplayName": "perk_displayname_FirstStrike"
+				},
+				"primaryRuneTree": {
+					"displayName": "Inspiration",
+					"id": 8300,
+					"rawDescription": "perkstyle_tooltip_7203",
+					"rawDisplayName": "perkstyle_displayname_7203"
+				},
+				"secondaryRuneTree": {
+					"displayName": "Sorcellerie",
+					"id": 8200,
+					"rawDescription": "perkstyle_tooltip_7202",
+					"rawDisplayName": "perkstyle_displayname_7202"
+				}
+			},
+			"scores": {
+				"assists": 0,
+				"creepScore": 0,
+				"deaths": 0,
+				"kills": 0,
+				"wardScore": 0.0
+			},
+			"skinID": 2,
+			"skinName": "Syndra de l'Atlantide",
+			"summonerName": "AZNVR#1966",
+			"summonerSpells": {
+				"summonerSpellOne": {
+					"displayName": "Saut éclair",
+					"rawDescription": "GeneratedTip_SummonerSpell_SummonerFlash_Description",
+					"rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+				},
+				"summonerSpellTwo": {
+					"displayName": "Téléportation",
+					"rawDescription": "GeneratedTip_SummonerSpell_SummonerTeleport_Description",
+					"rawDisplayName": "GeneratedTip_SummonerSpell_SummonerTeleport_DisplayName"
+				}
+			},
+			"team": "ORDER"
+		},
+		{
+			"championName": "",
+			"isBot": true,
+			"isDead": false,
+			"items": {
+				"error": "Unable to find player"
+			},
+			"level": 1,
+			"position": "",
+			"rawChampionName": "",
+			"rawSkinName": "game_character_skin_displayname_PracticeTool_TargetDummy_1",
+			"respawnTimer": 0.0,
+			"riotId": "",
+			"riotIdGameName": "",
+			"riotIdTagLine": "",
+			"runes": {
+				"error": "Unable to find player"
+			},
+			"scores": {
+				"error": "Unable to find player"
+			},
+			"skinID": 1,
+			"skinName": "Mannequin",
+			"summonerName": "Unknown",
+			"summonerSpells": {
+				"error": "Unable to find player"
+			},
+			"team": "CHAOS"
+		}
+	],
+	"events": {
+		"Events": [
+			{
+				"EventID": 0,
+				"EventName": "GameStart",
+				"EventTime": 0.02416680008172989
+			},
+			{
+				"EventID": 1,
+				"EventName": "MinionsSpawning",
+				"EventTime": 30.035484313964845
+			}
+		]
+	},
+	"gameData": {
+		"gameMode": "PRACTICETOOL",
+		"gameTime": 377.6671447753906,
+		"mapName": "Map11",
+		"mapNumber": 11,
+		"mapTerrain": "Default"
+	}
+}
