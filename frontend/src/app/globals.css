@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+:root {
+  --bg:       #070b14;
+  --bg-card:  #0d1525;
+  --bg-hover: #111d35;
+  --border:   rgba(200,155,60,0.15);
+  --gold:     #c89b3c;
+  --gold-dim: #8a6d2a;
+  --blue:     #0bc4e3;
+  --red:      #e84057;
+  --text:     #e8e0d0;
+  --muted:    rgba(232,224,208,0.45);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--gold);
+  color: var(--bg);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
+
+/* Glow utilities */
+.glow-gold { box-shadow: 0 0 24px rgba(200,155,60,0.2); }
+.glow-blue { box-shadow: 0 0 24px rgba(11,196,227,0.15); }
+.glow-red  { box-shadow: 0 0 24px rgba(232,64,87,0.15); }
+
+/* Card border shine */
+.card-shine {
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card-shine:hover {
+  border-color: rgba(200,155,60,0.4);
+  box-shadow: 0 0 32px rgba(200,155,60,0.1);
+}
+
+/* Gold gradient text */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #f0d080 0%, #c89b3c 50%, #8a6d2a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Divider */
+.divider-gold {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+}
