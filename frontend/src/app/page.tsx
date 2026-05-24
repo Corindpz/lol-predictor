@@ -79,11 +79,19 @@ export default function Home() {
           ))}
         </div>
 
-        <button onClick={() => router.push("/simulator")}
-          className="text-xs opacity-50 hover:opacity-100 transition-opacity"
-          style={{ color: "var(--gold)" }}>
-          Essayer le simulateur sans compte →
-        </button>
+        <div className="flex items-center gap-6">
+          <button onClick={() => router.push("/simulator")}
+            className="text-xs opacity-50 hover:opacity-100 transition-opacity"
+            style={{ color: "var(--gold)" }}>
+            Simulateur →
+          </button>
+          <span style={{ color: "var(--border)" }}>|</span>
+          <button onClick={() => router.push("/pro")}
+            className="text-xs opacity-50 hover:opacity-100 transition-opacity"
+            style={{ color: "var(--gold)" }}>
+            Et en pro ? →
+          </button>
+        </div>
       </div>
     </main>
   );

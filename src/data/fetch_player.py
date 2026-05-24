@@ -43,9 +43,24 @@ def _get(url: str, params: dict = None, retries: int = 3):
     return None
 
 
+ROUTING = {
+    "euw": {"account": "europe", "match": "europe"},
+    "kr":  {"account": "asia",   "match": "asia"},
+    "na":  {"account": "americas", "match": "americas"},
+    "br":  {"account": "americas", "match": "americas"},
+}
+
+
 def get_puuid(game_name: str, tag_line: str) -> str | None:
-    """Résout un Riot ID (GameName#TAG) en PUUID."""
+    """Résout un Riot ID (GameName#TAG) en PUUID — région EUW par défaut."""
     url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{game_name}/{tag_line}"
+    data = _get(url)
+    return data["puuid"] if data else None
+
+
+def get_puuid_region(game_name: str, tag_line: str, region: str = "euw") -> str | None:
+    routing = ROUTING.get(region, ROUTING["euw"])
+    url = f"https://{routing['account']}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{game_name}/{tag_line}"
     data = _get(url)
     return data["puuid"] if data else None
 
@@ -53,6 +68,34 @@ def get_puuid(game_name: str, tag_line: str) -> str | None:
 def get_recent_matches(puuid: str, count: int = 10) -> list[str]:
     url = f"https://{MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids"
     return _get(url, params={"queue": 420, "count": count}) or []
+
+
+def get_recent_matches_region(puuid: str, region: str = "euw", count: int = 10) -> list[str]:
+    routing = ROUTING.get(region, ROUTING["euw"])
+    url = f"https://{routing['match']}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids"
+    return _get(url, params={"count": count}) or []
+
+
+def get_match_info_region(match_id: str, region: str = "euw") -> dict | None:
+    cache = CACHE_DIR / f"{match_id}_info.json"
+    if cache.exists():
+        return json.loads(cache.read_text())
+    routing = ROUTING.get(region, ROUTING["euw"])
+    data = _get(f"https://{routing['match']}.api.riotgames.com/lol/match/v5/matches/{match_id}")
+    if data:
+        cache.write_text(json.dumps(data))
+    return data
+
+
+def get_match_timeline_region(match_id: str, region: str = "euw") -> dict | None:
+    cache = CACHE_DIR / f"{match_id}_timeline.json"
+    if cache.exists():
+        return json.loads(cache.read_text())
+    routing = ROUTING.get(region, ROUTING["euw"])
+    data = _get(f"https://{routing['match']}.api.riotgames.com/lol/match/v5/matches/{match_id}/timeline")
+    if data:
+        cache.write_text(json.dumps(data))
+    return data
 
 
 def get_match_info(match_id: str) -> dict | None:
@@ -121,26 +164,30 @@ def extract_full_timeline(timeline: dict, info: dict) -> dict:
     kills_blue = kills_red = 0
     deaths_blue = deaths_red = 0
     towers_blue = towers_red = 0
+    inhibitors_blue = inhibitors_red = 0
     dragons_blue = dragons_red = 0
     heralds_blue = heralds_red = 0
     barons_blue = barons_red = 0
-    kills_blue_window = []  # (timestamp_sec, )
+    wards_blue = wards_red = 0
+    kills_blue_window = []
+    first_blood = 0  # +1 = blue, -1 = red
 
     for frame_idx, frame in enumerate(frames):
         pf = frame.get("participantFrames", {})
 
-        blue_cs = blue_gold = blue_level = 0
-        red_cs = red_gold = red_level = 0
+        blue_cs = blue_gold = blue_level = blue_damage = 0
+        red_cs = red_gold = red_level = red_damage = 0
 
         for pid_str, stats in pf.items():
             pid = int(pid_str)
             cs = stats.get("minionsKilled", 0) + stats.get("jungleMinionsKilled", 0)
             gold = stats.get("totalGold", 0)
             level = stats.get("level", 0)
+            dmg = stats.get("damageStats", {}).get("totalDamageDoneToChampions", 0)
             if pid in BLUE_IDS:
-                blue_cs += cs; blue_gold += gold; blue_level += level
+                blue_cs += cs; blue_gold += gold; blue_level += level; blue_damage += dmg
             else:
-                red_cs += cs; red_gold += gold; red_level += level
+                red_cs += cs; red_gold += gold; red_level += level; red_damage += dmg
 
         current_time_sec = frame_idx * 60
 
@@ -155,8 +202,12 @@ def extract_full_timeline(timeline: dict, info: dict) -> dict:
                 if killer_id in BLUE_IDS:
                     kills_blue += 1
                     kills_blue_window.append(ts)
+                    if first_blood == 0:
+                        first_blood = 1
                 elif killer_id in RED_IDS:
                     kills_red += 1
+                    if first_blood == 0:
+                        first_blood = -1
                 if victim_id in BLUE_IDS:
                     deaths_blue += 1
                 elif victim_id in RED_IDS:
@@ -166,24 +217,32 @@ def extract_full_timeline(timeline: dict, info: dict) -> dict:
                     key_events.append({"min": round(ts/60,1), "label": "⚔️ First Blood", "team": "blue" if killer_id in BLUE_IDS else "red"})
 
             elif etype == "BUILDING_KILL":
-                if killer_team == 100:
-                    towers_blue += 1
-                    key_events.append({"min": round(ts/60,1), "label": "🏰 Tour détruite", "team": "blue"})
+                btype = event.get("buildingType", "")
+                if btype == "INHIBITOR_BUILDING":
+                    if killer_team == 100:
+                        inhibitors_blue += 1
+                        key_events.append({"min": round(ts/60,1), "label": "🔴 Inhibiteur détruit", "team": "blue"})
+                    else:
+                        inhibitors_red += 1
+                        key_events.append({"min": round(ts/60,1), "label": "🔴 Inhibiteur détruit", "team": "red"})
                 else:
-                    towers_red += 1
-                    key_events.append({"min": round(ts/60,1), "label": "🏰 Tour détruite", "team": "red"})
+                    if killer_team == 100:
+                        towers_blue += 1
+                        key_events.append({"min": round(ts/60,1), "label": "🏰 Tour détruite", "team": "blue"})
+                    else:
+                        towers_red += 1
+                        key_events.append({"min": round(ts/60,1), "label": "🏰 Tour détruite", "team": "red"})
 
             elif etype == "ELITE_MONSTER_KILL":
                 monster = event.get("monsterType", "")
-                sub_type = event.get("monsterSubType", "")
                 if monster == "DRAGON":
                     if killer_team == 100:
                         dragons_blue += 1
-                        label = f"🐉 Dragon Soul!" if dragons_blue == 4 else "🐉 Dragon"
+                        label = "🐉 Dragon Soul!" if dragons_blue == 4 else "🐉 Dragon"
                         key_events.append({"min": round(ts/60,1), "label": label, "team": "blue"})
                     else:
                         dragons_red += 1
-                        label = f"🐉 Dragon Soul!" if dragons_red == 4 else "🐉 Dragon"
+                        label = "🐉 Dragon Soul!" if dragons_red == 4 else "🐉 Dragon"
                         key_events.append({"min": round(ts/60,1), "label": label, "team": "red"})
                 elif monster == "BARON_NASHOR":
                     if killer_team == 100:
@@ -198,7 +257,13 @@ def extract_full_timeline(timeline: dict, info: dict) -> dict:
                     else:
                         heralds_red += 1
 
-        # Kills dans les 3 dernières minutes
+            elif etype == "WARD_PLACED":
+                creator = event.get("creatorId", 0)
+                if creator in BLUE_IDS:
+                    wards_blue += 1
+                elif creator in RED_IDS:
+                    wards_red += 1
+
         kills_blue_recent = sum(1 for t in kills_blue_window if t >= current_time_sec - 180)
 
         features_by_min.append({
@@ -214,6 +279,10 @@ def extract_full_timeline(timeline: dict, info: dict) -> dict:
             "barons_diff": barons_blue - barons_red,
             "kills_last_3min": kills_blue_recent,
             "game_time_minutes": frame_idx,
+            "wards_diff": wards_blue - wards_red,
+            "inhibitors_diff": inhibitors_blue - inhibitors_red,
+            "damage_diff": blue_damage - red_damage,
+            "first_blood": first_blood,
         })
 
     return {

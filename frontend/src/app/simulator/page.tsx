@@ -9,20 +9,25 @@ interface Slider { key: string; label: string; min: number; max: number; step: n
 
 const SLIDERS: Slider[] = [
   { key: "game_time_minutes", label: "Temps de jeu", min: 5, max: 45, step: 1, unit: "min" },
-  { key: "gold_diff",         label: "Avantage gold (bleu)",  min: -15000, max: 15000, step: 100, unit: "g" },
-  { key: "kills_diff",        label: "Avantage kills (bleu)", min: -20, max: 20, step: 1 },
+  { key: "gold_diff",         label: "Avantage gold",         min: -15000, max: 15000, step: 100, unit: "g" },
+  { key: "kills_diff",        label: "Avantage kills",        min: -20, max: 20, step: 1 },
   { key: "towers_diff",       label: "Avantage tours",        min: -10, max: 10, step: 1 },
   { key: "dragons_diff",      label: "Avantage dragons",      min: -4, max: 4, step: 1 },
   { key: "barons_diff",       label: "Avantage barons",       min: -3, max: 3, step: 1 },
   { key: "cs_diff",           label: "Avantage CS",           min: -200, max: 200, step: 5 },
   { key: "level_diff",        label: "Avantage niveaux",      min: -12, max: 12, step: 1 },
   { key: "kills_last_3min",   label: "Kills récents (3 min)", min: 0, max: 15, step: 1 },
+  { key: "wards_diff",        label: "Avantage wards",        min: -50, max: 50, step: 1 },
+  { key: "damage_diff",       label: "Avantage dégâts",       min: -60000, max: 60000, step: 1000, unit: "dmg" },
+  { key: "first_blood",       label: "First Blood",           min: -1, max: 1, step: 1 },
+  { key: "inhibitors_diff",   label: "Avantage inhibiteurs",  min: -3, max: 3, step: 1 },
 ];
 
 const DEFAULTS: Record<string, number> = {
   game_time_minutes: 20, gold_diff: 0, kills_diff: 0, towers_diff: 0,
   dragons_diff: 0, barons_diff: 0, cs_diff: 0, level_diff: 0,
   heralds_diff: 0, deaths_diff: 0, kills_last_3min: 0,
+  wards_diff: 0, damage_diff: 0, first_blood: 0, inhibitors_diff: 0,
 };
 
 export default function SimulatorPage() {
@@ -64,6 +69,8 @@ export default function SimulatorPage() {
     dragons_diff: "Dragons", barons_diff: "Barons", cs_diff: "CS",
     level_diff: "Niveaux", kills_last_3min: "Kills récents",
     heralds_diff: "Hérauts", deaths_diff: "Morts",
+    wards_diff: "Wards", damage_diff: "Dégâts", first_blood: "First Blood",
+    inhibitors_diff: "Inhibiteurs",
   };
 
   return (

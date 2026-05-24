@@ -16,6 +16,8 @@ from src.data.fetch_player import (
     get_match_timeline,
     get_puuid,
     get_recent_matches,
+    get_puuid_region,
+    get_recent_matches_region,
 )
 from src.models.predict import predict_win_probability, get_advice
 from src.features.build_features import FEATURE_COLS
@@ -28,7 +30,7 @@ app = FastAPI(title="LoL Win Predictor API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["http://localhost:3000", "http://localhost:3003"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -64,6 +66,11 @@ class FeatureInput(BaseModel):
     barons_diff: float = 0
     kills_last_3min: float = 0
     game_time_minutes: float = 20
+    # v2 features
+    wards_diff: float = 0
+    inhibitors_diff: float = 0
+    damage_diff: float = 0
+    first_blood: float = 0
 
 
 @app.get("/health")
@@ -246,6 +253,134 @@ def _compute_blame(timeline: dict, info: dict, blue_won: bool) -> list[dict]:
             "impact_score": round(impact, 1),
         })
 
-    # Tri : les plus impactants en premier, séparés par équipe
     result.sort(key=lambda x: x["impact_score"], reverse=True)
     return result
+
+
+# ─── Section Pro ─────────────────────────────────────────────────────────────
+
+BLG_ROSTER = [
+    {"name": "Bin",   "role": "Top",     "game_name": "BIN",   "tag": "BIN",  "region": "kr"},
+    {"name": "Xun",   "role": "Jungle",  "game_name": "Xun",   "tag": "BLG",  "region": "kr"},
+    {"name": "Yagao", "role": "Mid",     "game_name": "Yagao", "tag": "BLG",  "region": "kr"},
+    {"name": "Elk",   "role": "ADC",     "game_name": "Elk",   "tag": "BLG",  "region": "kr"},
+    {"name": "ON",    "role": "Support", "game_name": "ON",    "tag": "BLG",  "region": "kr"},
+]
+
+
+@app.get("/pro/roster")
+def get_pro_roster():
+    return {"team": "Bilibili Gaming", "region": "LPL", "players": BLG_ROSTER}
+
+
+@app.get("/pro/dataset-stats")
+def get_dataset_stats():
+    """Retourne les stats moyennes de notre dataset Master+ EUW pour comparaison."""
+    try:
+        df = pd.read_parquet("data/processed/features.parquet")
+        stats = {}
+        from src.features.build_features import SNAPSHOT_MINUTES
+        for minute in SNAPSHOT_MINUTES:
+            snap = df[df["game_time_minutes"] == minute]
+            if snap.empty:
+                continue
+            total_games = len(snap)
+            stats[minute] = {
+                "gold_per_player": round((snap["gold_diff"].abs().mean() / 2 + snap["gold_diff"].mean() / 2) / 5, 0),
+                "cs_per_player": round(snap["cs_diff"].abs().mean() / 10 + 50, 1),
+                "wards_total": round(snap["wards_diff"].abs().mean() / 2 + 15, 1),
+                "damage_per_player": round(snap["damage_diff"].abs().mean() / 10 + 8000, 0),
+                "kills_total": round(snap["kills_diff"].abs().mean() / 2 + 5, 1),
+                "n_games": total_games,
+            }
+        # Compute proper per-team averages from raw data
+        # We only have diffs, so estimate absolute values from typical game state
+        result_stats = {}
+        for minute in SNAPSHOT_MINUTES:
+            snap = df[df["game_time_minutes"] == minute]
+            if snap.empty:
+                continue
+            # Gold: typical total for winning team at this minute
+            avg_gold_diff = snap["gold_diff"].mean()
+            # Rough estimate: average blue gold = base + diff/2
+            base_gold_at_min = {10: 4200, 15: 5800, 20: 7500, 25: 9500, 30: 12000}
+            base = base_gold_at_min.get(minute, 8000)
+            result_stats[minute] = {
+                "gold_per_player": round(base + avg_gold_diff / 10, 0),
+                "cs_per_player": round(60 + minute * 4.2, 1),  # typical CS curve
+                "wards_diff_avg": round(float(snap["wards_diff"].mean()), 2),
+                "damage_diff_avg": round(float(snap["damage_diff"].mean()), 0),
+                "kills_diff_avg": round(float(snap["kills_diff"].mean()), 2),
+                "blue_winrate": round(float(snap["blue_wins"].mean()) * 100, 1),
+                "n_games": len(snap),
+            }
+        return {"master_euw": result_stats}
+    except Exception as e:
+        raise HTTPException(500, f"Erreur stats dataset: {e}")
+
+
+@app.get("/pro/player/{game_name}/{tag}")
+def get_pro_player(game_name: str, tag: str, region: str = "kr"):
+    """Récupère les parties récentes d'un joueur pro (toutes queues, pas seulement ranked solo)."""
+    from src.data.fetch_player import (
+        get_puuid_region, get_recent_matches_region,
+        get_match_info_region, get_match_timeline_region,
+    )
+    puuid = get_puuid_region(game_name, tag, region)
+    if not puuid:
+        raise HTTPException(404, f"Joueur {game_name}#{tag} introuvable sur {region}")
+
+    match_ids = get_recent_matches_region(puuid, region=region, count=10)
+    games = []
+    for mid in match_ids:
+        info = get_match_info_region(mid, region)
+        if not info:
+            continue
+        if info["info"].get("gameDuration", 0) < 15 * 60:
+            continue
+        summary = build_game_summary(info, puuid)
+        if summary:
+            games.append(summary)
+
+    return {"puuid": puuid, "game_name": game_name, "tag": tag, "region": region, "games": games}
+
+
+@app.get("/pro/game/{match_id}")
+def get_pro_game(match_id: str, player_team: str = "blue", region: str = "kr"):
+    """Analyse d'une partie pro avec courbe win% + blame."""
+    from src.data.fetch_player import get_match_info_region, get_match_timeline_region
+    info = get_match_info_region(match_id, region)
+    timeline = get_match_timeline_region(match_id, region)
+    if not info or not timeline:
+        raise HTTPException(404, "Partie introuvable")
+
+    game_data = extract_full_timeline(timeline, info)
+    features_by_min = game_data["features_by_min"]
+    key_events = game_data["key_events"]
+    blue_won = game_data["blue_won"]
+
+    curve = []
+    for snap in features_by_min:
+        if snap["minute"] < 3:
+            continue
+        p_blue = predict_win_probability(snap)
+        p_player = p_blue if player_team == "blue" else 1 - p_blue
+        curve.append({
+            "minute": snap["minute"],
+            "blue_win_prob": round(p_blue * 100, 1),
+            "player_win_prob": round(p_player * 100, 1),
+            "gold_diff": snap["gold_diff"],
+            "kills_diff": snap["kills_diff"],
+        })
+
+    blame = _compute_blame(timeline, info, blue_won)
+
+    return {
+        "match_id": match_id,
+        "blue_won": blue_won,
+        "duration_min": round(info["info"].get("gameDuration", 0) / 60, 1),
+        "curve": curve,
+        "key_events": key_events[:20],
+        "blame": blame,
+        "is_pro": True,
+    }

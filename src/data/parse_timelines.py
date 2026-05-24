@@ -36,10 +36,10 @@ def _extract_snapshot(frames: list[dict], target_min: int) -> dict | None:
     frame = frames[target_min]
     pf = frame.get("participantFrames", {})
 
-    blue, red = {"kills": 0, "deaths": 0, "cs": 0, "gold": 0, "level": 0}, \
-                {"kills": 0, "deaths": 0, "cs": 0, "gold": 0, "level": 0}
+    blue = {"kills": 0, "deaths": 0, "cs": 0, "gold": 0, "level": 0, "damage": 0}
+    red  = {"kills": 0, "deaths": 0, "cs": 0, "gold": 0, "level": 0, "damage": 0}
 
-    # CS, gold, level viennent des participantFrames
+    # CS, gold, level, damage from participantFrames at target_min
     for pid_str, stats in pf.items():
         pid = int(pid_str)
         bucket = blue if pid in BLUE_IDS else red
@@ -47,16 +47,19 @@ def _extract_snapshot(frames: list[dict], target_min: int) -> dict | None:
         bucket["cs"] += cs
         bucket["gold"] += stats.get("totalGold", 0)
         bucket["level"] += stats.get("level", 0)
+        bucket["damage"] += stats.get("damageStats", {}).get("totalDamageDoneToChampions", 0)
 
     if not pf:
         return None
 
-    # Kills et deaths viennent des events CHAMPION_KILL (pas dans participantFrames)
     towers_blue = towers_red = 0
+    inhibitors_blue = inhibitors_red = 0
     dragons_blue = dragons_red = 0
     heralds_blue = heralds_red = 0
     barons_blue = barons_red = 0
+    wards_blue = wards_red = 0
     kills_blue_recent = 0
+    first_blood = 0  # +1 = blue, -1 = red, 0 = no kill yet
 
     for f in frames[: target_min + 1]:
         is_recent = f in frames[max(0, target_min - 2): target_min + 1]
@@ -71,18 +74,29 @@ def _extract_snapshot(frames: list[dict], target_min: int) -> dict | None:
                     blue["kills"] += 1
                     if is_recent:
                         kills_blue_recent += 1
+                    if first_blood == 0:
+                        first_blood = 1
                 elif killer_id in RED_IDS:
                     red["kills"] += 1
+                    if first_blood == 0:
+                        first_blood = -1
                 if victim_id in BLUE_IDS:
                     blue["deaths"] += 1
                 elif victim_id in RED_IDS:
                     red["deaths"] += 1
 
             elif etype == "BUILDING_KILL":
-                if killer_team == 100:
-                    towers_blue += 1
+                btype = event.get("buildingType", "")
+                if btype == "INHIBITOR_BUILDING":
+                    if killer_team == 100:
+                        inhibitors_blue += 1
+                    else:
+                        inhibitors_red += 1
                 else:
-                    towers_red += 1
+                    if killer_team == 100:
+                        towers_blue += 1
+                    else:
+                        towers_red += 1
 
             elif etype == "ELITE_MONSTER_KILL":
                 monster = event.get("monsterType", "")
@@ -102,6 +116,13 @@ def _extract_snapshot(frames: list[dict], target_min: int) -> dict | None:
                     else:
                         heralds_red += 1
 
+            elif etype == "WARD_PLACED":
+                creator = event.get("creatorId", 0)
+                if creator in BLUE_IDS:
+                    wards_blue += 1
+                elif creator in RED_IDS:
+                    wards_red += 1
+
     return {
         "kills_diff": blue["kills"] - red["kills"],
         "deaths_diff": blue["deaths"] - red["deaths"],
@@ -114,6 +135,10 @@ def _extract_snapshot(frames: list[dict], target_min: int) -> dict | None:
         "barons_diff": barons_blue - barons_red,
         "kills_last_3min": kills_blue_recent,
         "game_time_minutes": target_min,
+        "wards_diff": wards_blue - wards_red,
+        "inhibitors_diff": inhibitors_blue - inhibitors_red,
+        "damage_diff": blue["damage"] - red["damage"],
+        "first_blood": first_blood,
     }
 
 

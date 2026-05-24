@@ -15,6 +15,11 @@ FEATURE_COLS = [
     "barons_diff",
     "kills_last_3min",
     "game_time_minutes",
+    # v2 features
+    "wards_diff",
+    "inhibitors_diff",
+    "damage_diff",
+    "first_blood",
 ]
 
 TARGET_COL = "blue_wins"
