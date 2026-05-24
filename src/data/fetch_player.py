@@ -169,25 +169,32 @@ def extract_full_timeline(timeline: dict, info: dict) -> dict:
     heralds_blue = heralds_red = 0
     barons_blue = barons_red = 0
     wards_blue = wards_red = 0
+    plates_blue = plates_red = 0
     kills_blue_window = []
-    first_blood = 0  # +1 = blue, -1 = red
+    first_blood = 0
+    dragon_soul = 0
 
     for frame_idx, frame in enumerate(frames):
         pf = frame.get("participantFrames", {})
 
-        blue_cs = blue_gold = blue_level = blue_damage = 0
-        red_cs = red_gold = red_level = red_damage = 0
+        blue_cs = blue_gold = blue_level = blue_damage = blue_xp = blue_cur_gold = blue_cc = 0
+        red_cs  = red_gold  = red_level  = red_damage  = red_xp  = red_cur_gold  = red_cc  = 0
 
         for pid_str, stats in pf.items():
             pid = int(pid_str)
-            cs = stats.get("minionsKilled", 0) + stats.get("jungleMinionsKilled", 0)
+            cs   = stats.get("minionsKilled", 0) + stats.get("jungleMinionsKilled", 0)
             gold = stats.get("totalGold", 0)
-            level = stats.get("level", 0)
-            dmg = stats.get("damageStats", {}).get("totalDamageDoneToChampions", 0)
+            lv   = stats.get("level", 0)
+            dmg  = stats.get("damageStats", {}).get("totalDamageDoneToChampions", 0)
+            xp   = stats.get("xp", 0)
+            cg   = stats.get("currentGold", 0)
+            cc   = stats.get("timeEnemySpentControlled", 0)
             if pid in BLUE_IDS:
-                blue_cs += cs; blue_gold += gold; blue_level += level; blue_damage += dmg
+                blue_cs += cs; blue_gold += gold; blue_level += lv; blue_damage += dmg
+                blue_xp += xp; blue_cur_gold += cg; blue_cc += cc
             else:
-                red_cs += cs; red_gold += gold; red_level += level; red_damage += dmg
+                red_cs += cs; red_gold += gold; red_level += lv; red_damage += dmg
+                red_xp += xp; red_cur_gold += cg; red_cc += cc
 
         current_time_sec = frame_idx * 60
 
@@ -264,6 +271,17 @@ def extract_full_timeline(timeline: dict, info: dict) -> dict:
                 elif creator in RED_IDS:
                     wards_red += 1
 
+            elif etype == "TURRET_PLATE_DESTROYED":
+                plate_team = event.get("teamId", 0)
+                if plate_team == 100:
+                    plates_red += 1
+                else:
+                    plates_blue += 1
+
+            elif etype == "DRAGON_SOUL_GIVEN":
+                soul_team = event.get("teamId", 0)
+                dragon_soul = 1 if soul_team == 100 else -1
+
         kills_blue_recent = sum(1 for t in kills_blue_window if t >= current_time_sec - 180)
 
         features_by_min.append({
@@ -283,6 +301,11 @@ def extract_full_timeline(timeline: dict, info: dict) -> dict:
             "inhibitors_diff": inhibitors_blue - inhibitors_red,
             "damage_diff": blue_damage - red_damage,
             "first_blood": first_blood,
+            "xp_diff": blue_xp - red_xp,
+            "plates_diff": plates_blue - plates_red,
+            "current_gold_diff": blue_cur_gold - red_cur_gold,
+            "dragon_soul": dragon_soul,
+            "cc_diff": blue_cc - red_cc,
         })
 
     return {

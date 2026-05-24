@@ -71,6 +71,12 @@ class FeatureInput(BaseModel):
     inhibitors_diff: float = 0
     damage_diff: float = 0
     first_blood: float = 0
+    # v3 features
+    xp_diff: float = 0
+    plates_diff: float = 0
+    current_gold_diff: float = 0
+    dragon_soul: float = 0
+    cc_diff: float = 0
 
 
 @app.get("/health")

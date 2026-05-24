@@ -20,6 +20,12 @@ FEATURE_COLS = [
     "inhibitors_diff",
     "damage_diff",
     "first_blood",
+    # v3 features
+    "xp_diff",
+    "plates_diff",
+    "current_gold_diff",
+    "dragon_soul",
+    "cc_diff",
 ]
 
 TARGET_COL = "blue_wins"

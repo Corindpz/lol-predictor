@@ -36,10 +36,10 @@ def _extract_snapshot(frames: list[dict], target_min: int) -> dict | None:
     frame = frames[target_min]
     pf = frame.get("participantFrames", {})
 
-    blue = {"kills": 0, "deaths": 0, "cs": 0, "gold": 0, "level": 0, "damage": 0}
-    red  = {"kills": 0, "deaths": 0, "cs": 0, "gold": 0, "level": 0, "damage": 0}
+    blue = {"kills": 0, "deaths": 0, "cs": 0, "gold": 0, "level": 0, "damage": 0, "xp": 0, "current_gold": 0, "cc": 0}
+    red  = {"kills": 0, "deaths": 0, "cs": 0, "gold": 0, "level": 0, "damage": 0, "xp": 0, "current_gold": 0, "cc": 0}
 
-    # CS, gold, level, damage from participantFrames at target_min
+    # CS, gold, level, damage, xp, current_gold, cc from participantFrames at target_min
     for pid_str, stats in pf.items():
         pid = int(pid_str)
         bucket = blue if pid in BLUE_IDS else red
@@ -47,6 +47,9 @@ def _extract_snapshot(frames: list[dict], target_min: int) -> dict | None:
         bucket["cs"] += cs
         bucket["gold"] += stats.get("totalGold", 0)
         bucket["level"] += stats.get("level", 0)
+        bucket["xp"] += stats.get("xp", 0)
+        bucket["current_gold"] += stats.get("currentGold", 0)
+        bucket["cc"] += stats.get("timeEnemySpentControlled", 0)
         bucket["damage"] += stats.get("damageStats", {}).get("totalDamageDoneToChampions", 0)
 
     if not pf:
@@ -58,8 +61,10 @@ def _extract_snapshot(frames: list[dict], target_min: int) -> dict | None:
     heralds_blue = heralds_red = 0
     barons_blue = barons_red = 0
     wards_blue = wards_red = 0
+    plates_blue = plates_red = 0
     kills_blue_recent = 0
     first_blood = 0  # +1 = blue, -1 = red, 0 = no kill yet
+    dragon_soul = 0  # +1 = blue soul, -1 = red soul, 0 = none
 
     for f in frames[: target_min + 1]:
         is_recent = f in frames[max(0, target_min - 2): target_min + 1]
@@ -123,6 +128,20 @@ def _extract_snapshot(frames: list[dict], target_min: int) -> dict | None:
                 elif creator in RED_IDS:
                     wards_red += 1
 
+            elif etype == "TURRET_PLATE_DESTROYED":
+                plate_team = event.get("teamId", 0)
+                if plate_team == 100:
+                    plates_red += 1   # plates destroyed = enemy team destroyed blue's plate
+                else:
+                    plates_blue += 1
+
+            elif etype == "DRAGON_SOUL_GIVEN":
+                soul_team = event.get("teamId", 0)
+                if soul_team == 100:
+                    dragon_soul = 1
+                else:
+                    dragon_soul = -1
+
     return {
         "kills_diff": blue["kills"] - red["kills"],
         "deaths_diff": blue["deaths"] - red["deaths"],
@@ -139,6 +158,11 @@ def _extract_snapshot(frames: list[dict], target_min: int) -> dict | None:
         "inhibitors_diff": inhibitors_blue - inhibitors_red,
         "damage_diff": blue["damage"] - red["damage"],
         "first_blood": first_blood,
+        "xp_diff": blue["xp"] - red["xp"],
+        "plates_diff": plates_blue - plates_red,
+        "current_gold_diff": blue["current_gold"] - red["current_gold"],
+        "dragon_soul": dragon_soul,
+        "cc_diff": blue["cc"] - red["cc"],
     }
 
 

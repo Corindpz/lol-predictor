@@ -45,18 +45,53 @@ def _get(url: str, params: dict = None, retries: int = 3) -> dict:
     return None
 
 
-def fetch_master_puuids(queue: str = "RANKED_SOLO_5x5") -> list[str]:
-    """Retourne les PUUIDs des joueurs Master+ sur EUW.
-    L'API retourne maintenant le puuid directement dans les entries — pas de requête intermédiaire.
-    """
-    url = f"https://{REGION}.api.riotgames.com/lol/league/v4/masterleagues/by-queue/{queue}"
+TIER_ENDPOINTS = {
+    "master":      f"https://{REGION}.api.riotgames.com/lol/league/v4/masterleagues/by-queue/RANKED_SOLO_5x5",
+    "grandmaster": f"https://{REGION}.api.riotgames.com/lol/league/v4/grandmasterleagues/by-queue/RANKED_SOLO_5x5",
+    "challenger":  f"https://{REGION}.api.riotgames.com/lol/league/v4/challengerleagues/by-queue/RANKED_SOLO_5x5",
+}
+
+TIER_PAGES = {
+    # tier, division → endpoint paginé
+    ("diamond", "I"):   f"https://{REGION}.api.riotgames.com/lol/league/v4/entries/RANKED_SOLO_5x5/DIAMOND/I",
+    ("diamond", "II"):  f"https://{REGION}.api.riotgames.com/lol/league/v4/entries/RANKED_SOLO_5x5/DIAMOND/II",
+    ("platinum", "I"):  f"https://{REGION}.api.riotgames.com/lol/league/v4/entries/RANKED_SOLO_5x5/PLATINUM/I",
+    ("gold", "I"):      f"https://{REGION}.api.riotgames.com/lol/league/v4/entries/RANKED_SOLO_5x5/GOLD/I",
+}
+
+
+def fetch_puuids_apex(tier: str = "master") -> list[str]:
+    """Master / Grandmaster / Challenger — le puuid est direct dans les entries."""
+    url = TIER_ENDPOINTS.get(tier)
+    if not url:
+        raise ValueError(f"Tier inconnu : {tier}")
     data = _get(url)
     if not data:
-        raise RuntimeError("Impossible de récupérer les Master.")
-
+        raise RuntimeError(f"Impossible de récupérer les {tier}.")
     entries = data.get("entries", [])
     puuids = [e["puuid"] for e in entries if "puuid" in e]
-    print(f"{len(entries)} joueurs Master EUW trouvés → {len(puuids)} PUUIDs récupérés instantanément")
+    print(f"  {len(entries)} joueurs {tier.capitalize()} EUW → {len(puuids)} PUUIDs")
+    return puuids
+
+
+def fetch_puuids_tier(tier: str, division: str, max_pages: int = 10) -> list[str]:
+    """Diamond/Platinum/Gold — endpoint paginé, retourne summonerId → lookup PUUID."""
+    url = TIER_PAGES.get((tier.lower(), division.upper()))
+    if not url:
+        raise ValueError(f"Tier/division inconnu : {tier} {division}")
+    puuids = []
+    for page in range(1, max_pages + 1):
+        data = _get(url, params={"page": page})
+        if not data:
+            break
+        for entry in data:
+            puuid = entry.get("puuid")
+            if puuid:
+                puuids.append(puuid)
+        if len(data) < 205:  # dernière page
+            break
+        time.sleep(0.5)
+    print(f"  {len(puuids)} PUUIDs récupérés ({tier.capitalize()} {division})")
     return puuids
 
 
@@ -90,13 +125,54 @@ def fetch_match_info(match_id: str) -> dict | None:
     return data
 
 
-def main(target_count: int):
+TIERS_CONFIG = [
+    # (fetch_fn_args, proportion)  — on répartit les matchs sur plusieurs elos
+    ("apex", "master",      0.35),
+    ("apex", "grandmaster", 0.10),
+    ("apex", "challenger",  0.05),
+    ("tier", ("diamond", "I"),   0.20),
+    ("tier", ("diamond", "II"),  0.15),
+    ("tier", ("platinum", "I"),  0.10),
+    ("tier", ("gold", "I"),      0.05),
+]
+
+
+def _collect_puuids_all() -> list[str]:
+    """Collecte les PUUIDs de tous les tiers configurés."""
+    all_puuids = []
+    for kind, arg, _ in TIERS_CONFIG:
+        try:
+            if kind == "apex":
+                all_puuids.extend(fetch_puuids_apex(arg))
+            else:
+                all_puuids.extend(fetch_puuids_tier(*arg))
+        except Exception as e:
+            print(f"  [skip] {arg} : {e}")
+        time.sleep(0.5)
+    return all_puuids
+
+
+def main(target_count: int, tiers: str = "all"):
     if not API_KEY:
         raise RuntimeError("RIOT_API_KEY manquante dans .env")
 
-    puuids = fetch_master_puuids()
+    print(f"Collecte des PUUIDs ({tiers})...")
+    if tiers == "master":
+        puuids = fetch_puuids_apex("master")
+    elif tiers == "all":
+        puuids = _collect_puuids_all()
+    else:
+        puuids = fetch_puuids_apex(tiers) if tiers in ("grandmaster", "challenger") else []
+
+    import random
+    random.shuffle(puuids)
+    print(f"Total PUUIDs : {len(puuids)}\n")
+
     collected = 0
     seen_ids = set()
+    # Pré-charger les IDs déjà présents
+    seen_ids = {f.stem.replace("_timeline", "") for f in RAW_DIR.glob("*_timeline.json")}
+    print(f"  {len(seen_ids)} timelines déjà en cache (skip)")
 
     pbar = tqdm(total=target_count, desc="Timelines")
     for puuid in puuids:
@@ -118,7 +194,6 @@ def main(target_count: int):
             if not info:
                 continue
 
-            # On garde uniquement les parties ranked solo complètes (pas de remake)
             game_duration = info.get("info", {}).get("gameDuration", 0)
             if game_duration < 15 * 60:
                 continue
@@ -130,11 +205,13 @@ def main(target_count: int):
                 pbar.update(1)
 
     pbar.close()
-    print(f"\n{collected} timelines sauvegardées dans {RAW_DIR}/")
+    print(f"\n{collected} nouvelles timelines → {RAW_DIR}/  (total cache : {len(seen_ids)})")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--count", type=int, default=500)
+    parser.add_argument("--tiers", default="all",
+                        help="all | master | grandmaster | challenger")
     args = parser.parse_args()
-    main(args.count)
+    main(args.count, args.tiers)

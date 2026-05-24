@@ -21,6 +21,11 @@ const SLIDERS: Slider[] = [
   { key: "damage_diff",       label: "Avantage dégâts",       min: -60000, max: 60000, step: 1000, unit: "dmg" },
   { key: "first_blood",       label: "First Blood",           min: -1, max: 1, step: 1 },
   { key: "inhibitors_diff",   label: "Avantage inhibiteurs",  min: -3, max: 3, step: 1 },
+  { key: "xp_diff",           label: "Avantage XP",           min: -8000, max: 8000, step: 100 },
+  { key: "plates_diff",       label: "Plaques détruites",     min: -6, max: 6, step: 1 },
+  { key: "current_gold_diff", label: "Gold non dépensé",      min: -5000, max: 5000, step: 100, unit: "g" },
+  { key: "dragon_soul",       label: "Dragon Soul",           min: -1, max: 1, step: 1 },
+  { key: "cc_diff",           label: "Contrôle (CC)",         min: -30000, max: 30000, step: 500, unit: "ms" },
 ];
 
 const DEFAULTS: Record<string, number> = {
@@ -28,6 +33,7 @@ const DEFAULTS: Record<string, number> = {
   dragons_diff: 0, barons_diff: 0, cs_diff: 0, level_diff: 0,
   heralds_diff: 0, deaths_diff: 0, kills_last_3min: 0,
   wards_diff: 0, damage_diff: 0, first_blood: 0, inhibitors_diff: 0,
+  xp_diff: 0, plates_diff: 0, current_gold_diff: 0, dragon_soul: 0, cc_diff: 0,
 };
 
 export default function SimulatorPage() {
@@ -70,7 +76,8 @@ export default function SimulatorPage() {
     level_diff: "Niveaux", kills_last_3min: "Kills récents",
     heralds_diff: "Hérauts", deaths_diff: "Morts",
     wards_diff: "Wards", damage_diff: "Dégâts", first_blood: "First Blood",
-    inhibitors_diff: "Inhibiteurs",
+    inhibitors_diff: "Inhibiteurs", xp_diff: "XP", plates_diff: "Plaques",
+    current_gold_diff: "Gold pocket", dragon_soul: "Dragon Soul", cc_diff: "CC",
   };
 
   return (
