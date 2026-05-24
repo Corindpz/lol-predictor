@@ -34,3 +34,4 @@ python src/models/train.py 2>&1 | python docs/log_session.py "nom_du_run"
 | # | Date | Contenu |
 |---|------|---------|
 | 001 | 2026-05-24 | Setup pipeline complet, 11 features, architecture Streamlit |
+| 002 | 2026-05-24 | 1000 matchs pull, fix parser kills/deaths, AUC 0.863 LogReg / 0.857 XGBoost |
