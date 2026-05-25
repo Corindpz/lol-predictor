@@ -3,7 +3,7 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2 } from "lucide-react";
 
-const API = "http://localhost:8000";
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 interface Slider { key: string; label: string; min: number; max: number; step: number; unit?: string; }
 
@@ -26,6 +26,18 @@ const SLIDERS: Slider[] = [
   { key: "current_gold_diff", label: "Gold non dépensé",      min: -5000, max: 5000, step: 100, unit: "g" },
   { key: "dragon_soul",       label: "Dragon Soul",           min: -1, max: 1, step: 1 },
   { key: "cc_diff",           label: "Contrôle (CC)",         min: -30000, max: 30000, step: 500, unit: "ms" },
+  // v4 features
+  { key: "void_grubs_diff",  label: "Void Grubs",            min: -6, max: 6, step: 1 },
+  { key: "first_tower",      label: "Première tour",         min: -1, max: 1, step: 1 },
+  { key: "infernal_diff",    label: "Dragons Infernaux",     min: -4, max: 4, step: 1 },
+  { key: "ocean_diff",       label: "Dragons Océan",         min: -4, max: 4, step: 1 },
+  { key: "elder_active",     label: "Buff Elder Dragon",     min: -1, max: 1, step: 1 },
+  { key: "powerspike_diff",  label: "Items Powerspike",      min: -10, max: 10, step: 1 },
+  // v5 features
+  { key: "mountain_diff",    label: "Dragons Montagne",      min: -4, max: 4, step: 1 },
+  { key: "cloud_diff",       label: "Dragons Nuage",         min: -4, max: 4, step: 1 },
+  { key: "chemtech_diff",    label: "Dragons Chemtech",      min: -4, max: 4, step: 1 },
+  { key: "hextech_diff",     label: "Dragons Hextech",       min: -4, max: 4, step: 1 },
 ];
 
 const DEFAULTS: Record<string, number> = {
@@ -34,6 +46,9 @@ const DEFAULTS: Record<string, number> = {
   heralds_diff: 0, deaths_diff: 0, kills_last_3min: 0,
   wards_diff: 0, damage_diff: 0, first_blood: 0, inhibitors_diff: 0,
   xp_diff: 0, plates_diff: 0, current_gold_diff: 0, dragon_soul: 0, cc_diff: 0,
+  void_grubs_diff: 0, first_tower: 0, infernal_diff: 0,
+  ocean_diff: 0, elder_active: 0, powerspike_diff: 0,
+  mountain_diff: 0, cloud_diff: 0, chemtech_diff: 0, hextech_diff: 0,
 };
 
 export default function SimulatorPage() {
@@ -78,6 +93,11 @@ export default function SimulatorPage() {
     wards_diff: "Wards", damage_diff: "Dégâts", first_blood: "First Blood",
     inhibitors_diff: "Inhibiteurs", xp_diff: "XP", plates_diff: "Plaques",
     current_gold_diff: "Gold pocket", dragon_soul: "Dragon Soul", cc_diff: "CC",
+    void_grubs_diff: "Void Grubs", first_tower: "1ère Tour",
+    infernal_diff: "Dragons Infernaux", ocean_diff: "Dragons Océan",
+    elder_active: "Buff Elder", powerspike_diff: "Powerspike Items",
+    mountain_diff: "Dragons Montagne", cloud_diff: "Dragons Nuage",
+    chemtech_diff: "Dragons Chemtech", hextech_diff: "Dragons Hextech",
   };
 
   return (

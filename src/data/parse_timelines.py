@@ -20,6 +20,18 @@ PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 BLUE_IDS = {1, 2, 3, 4, 5}
 RED_IDS = {6, 7, 8, 9, 10}
 
+# Items qui créent des powerspikes significatifs (item IDs 2024-2025)
+POWERSPIKE_ITEMS = {
+    3157,  # Zhonya's Hourglass
+    3089,  # Rabadon's Deathcap
+    3078,  # Trinity Force
+    3031,  # Infinity Edge
+    6672,  # Kraken Slayer
+    3071,  # Black Cleaver
+    6655,  # Luden's Tempest
+    4646,  # Stormsurge
+}
+
 
 def _blue_wins(info: dict) -> bool | None:
     for team in info.get("info", {}).get("teams", []):
@@ -39,7 +51,6 @@ def _extract_snapshot(frames: list[dict], target_min: int) -> dict | None:
     blue = {"kills": 0, "deaths": 0, "cs": 0, "gold": 0, "level": 0, "damage": 0, "xp": 0, "current_gold": 0, "cc": 0}
     red  = {"kills": 0, "deaths": 0, "cs": 0, "gold": 0, "level": 0, "damage": 0, "xp": 0, "current_gold": 0, "cc": 0}
 
-    # CS, gold, level, damage, xp, current_gold, cc from participantFrames at target_min
     for pid_str, stats in pf.items():
         pid = int(pid_str)
         bucket = blue if pid in BLUE_IDS else red
@@ -63,11 +74,27 @@ def _extract_snapshot(frames: list[dict], target_min: int) -> dict | None:
     wards_blue = wards_red = 0
     plates_blue = plates_red = 0
     kills_blue_recent = 0
-    first_blood = 0  # +1 = blue, -1 = red, 0 = no kill yet
-    dragon_soul = 0  # +1 = blue soul, -1 = red soul, 0 = none
 
-    for f in frames[: target_min + 1]:
-        is_recent = f in frames[max(0, target_min - 2): target_min + 1]
+    first_blood = 0        # +1 = blue, -1 = red
+    dragon_soul = 0        # +1 = blue soul, -1 = red soul
+
+    # v4 features
+    void_grubs_blue = void_grubs_red = 0
+    infernal_blue = infernal_red = 0
+    ocean_blue = ocean_red = 0
+    first_tower = 0            # +1 blue first, -1 red first
+    first_tower_done = False
+    elder_kill_frame = -999    # frame index of most recent elder kill
+    elder_active_team = 0      # 100 or 200
+    powerspike_blue = powerspike_red = 0
+    # v5 features
+    mountain_blue = mountain_red = 0
+    cloud_blue = cloud_red = 0
+    chemtech_blue = chemtech_red = 0
+    hextech_blue = hextech_red = 0
+
+    for f_idx, f in enumerate(frames[:target_min + 1]):
+        is_recent = f_idx >= max(0, target_min - 2)
         for event in f.get("events", []):
             etype = event.get("type")
             killer_team = event.get("killerTeamId", event.get("teamId", 0))
@@ -91,35 +118,83 @@ def _extract_snapshot(frames: list[dict], target_min: int) -> dict | None:
                     red["deaths"] += 1
 
             elif etype == "BUILDING_KILL":
+                # BUILDING_KILL: teamId = owner of the destroyed building (not the killer).
+                # teamId=100 → blue's building was killed by red → red team scores.
                 btype = event.get("buildingType", "")
                 if btype == "INHIBITOR_BUILDING":
                     if killer_team == 100:
-                        inhibitors_blue += 1
-                    else:
                         inhibitors_red += 1
-                else:
-                    if killer_team == 100:
-                        towers_blue += 1
                     else:
+                        inhibitors_blue += 1
+                else:
+                    if not first_tower_done:
+                        first_tower = -1 if killer_team == 100 else 1
+                        first_tower_done = True
+                    if killer_team == 100:
                         towers_red += 1
+                    else:
+                        towers_blue += 1
 
             elif etype == "ELITE_MONSTER_KILL":
                 monster = event.get("monsterType", "")
+                subtype = event.get("monsterSubType", "")
+
                 if monster == "DRAGON":
                     if killer_team == 100:
                         dragons_blue += 1
                     else:
                         dragons_red += 1
+                    if subtype == "FIRE_DRAGON":
+                        if killer_team == 100:
+                            infernal_blue += 1
+                        else:
+                            infernal_red += 1
+                    elif subtype == "WATER_DRAGON":
+                        if killer_team == 100:
+                            ocean_blue += 1
+                        else:
+                            ocean_red += 1
+                    elif subtype == "EARTH_DRAGON":
+                        if killer_team == 100:
+                            mountain_blue += 1
+                        else:
+                            mountain_red += 1
+                    elif subtype == "AIR_DRAGON":
+                        if killer_team == 100:
+                            cloud_blue += 1
+                        else:
+                            cloud_red += 1
+                    elif subtype == "CHEMTECH_DRAGON":
+                        if killer_team == 100:
+                            chemtech_blue += 1
+                        else:
+                            chemtech_red += 1
+                    elif subtype == "HEXTECH_DRAGON":
+                        if killer_team == 100:
+                            hextech_blue += 1
+                        else:
+                            hextech_red += 1
+                    elif subtype == "ELDER_DRAGON":
+                        elder_kill_frame = f_idx
+                        elder_active_team = killer_team
+
                 elif monster == "BARON_NASHOR":
                     if killer_team == 100:
                         barons_blue += 1
                     else:
                         barons_red += 1
+
                 elif monster == "RIFTHERALD":
                     if killer_team == 100:
                         heralds_blue += 1
                     else:
                         heralds_red += 1
+
+                elif monster == "HORDE":  # Void Grubs (Season 14+)
+                    if killer_team == 100:
+                        void_grubs_blue += 1
+                    else:
+                        void_grubs_red += 1
 
             elif etype == "WARD_PLACED":
                 creator = event.get("creatorId", 0)
@@ -131,7 +206,7 @@ def _extract_snapshot(frames: list[dict], target_min: int) -> dict | None:
             elif etype == "TURRET_PLATE_DESTROYED":
                 plate_team = event.get("teamId", 0)
                 if plate_team == 100:
-                    plates_red += 1   # plates destroyed = enemy team destroyed blue's plate
+                    plates_red += 1
                 else:
                     plates_blue += 1
 
@@ -141,6 +216,21 @@ def _extract_snapshot(frames: list[dict], target_min: int) -> dict | None:
                     dragon_soul = 1
                 else:
                     dragon_soul = -1
+
+            elif etype == "ITEM_PURCHASED":
+                pid = event.get("participantId", 0)
+                item_id = event.get("itemId", 0)
+                if item_id in POWERSPIKE_ITEMS:
+                    if pid in BLUE_IDS:
+                        powerspike_blue += 1
+                    elif pid in RED_IDS:
+                        powerspike_red += 1
+
+    # Elder buff dure ~3 minutes (3 frames)
+    if elder_kill_frame >= 0 and target_min - elder_kill_frame <= 3:
+        elder_active = 1 if elder_active_team == 100 else -1
+    else:
+        elder_active = 0
 
     return {
         "kills_diff": blue["kills"] - red["kills"],
@@ -163,6 +253,18 @@ def _extract_snapshot(frames: list[dict], target_min: int) -> dict | None:
         "current_gold_diff": blue["current_gold"] - red["current_gold"],
         "dragon_soul": dragon_soul,
         "cc_diff": blue["cc"] - red["cc"],
+        # v4 features
+        "void_grubs_diff": void_grubs_blue - void_grubs_red,
+        "first_tower": first_tower,
+        "infernal_diff": infernal_blue - infernal_red,
+        "ocean_diff": ocean_blue - ocean_red,
+        "elder_active": elder_active,
+        "powerspike_diff": powerspike_blue - powerspike_red,
+        # v5 features
+        "mountain_diff": mountain_blue - mountain_red,
+        "cloud_diff": cloud_blue - cloud_red,
+        "chemtech_diff": chemtech_blue - chemtech_red,
+        "hextech_diff": hextech_blue - hextech_red,
     }
 
 

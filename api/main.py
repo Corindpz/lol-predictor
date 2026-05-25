@@ -1,6 +1,7 @@
 """FastAPI backend — sert les prédictions et les analyses post-game."""
 
 import sys
+import json
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -28,9 +29,13 @@ import pandas as pd
 
 app = FastAPI(title="LoL Win Predictor API")
 
+import os
+_CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:3003").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3003"],
+    allow_origins=_CORS_ORIGINS,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -77,6 +82,18 @@ class FeatureInput(BaseModel):
     current_gold_diff: float = 0
     dragon_soul: float = 0
     cc_diff: float = 0
+    # v4 features
+    void_grubs_diff: float = 0
+    first_tower: float = 0
+    infernal_diff: float = 0
+    ocean_diff: float = 0
+    elder_active: float = 0
+    powerspike_diff: float = 0
+    # v5 features
+    mountain_diff: float = 0
+    cloud_diff: float = 0
+    chemtech_diff: float = 0
+    hextech_diff: float = 0
 
 
 @app.get("/health")
@@ -389,4 +406,253 @@ def get_pro_game(match_id: str, player_team: str = "blue", region: str = "kr"):
         "key_events": key_events[:20],
         "blame": blame,
         "is_pro": True,
+    }
+
+
+# ─── Tournois lolesports ──────────────────────────────────────────────────────
+
+@app.get("/pro/schedule/{league}")
+def get_tournament_schedule(league: str = "lec", count: int = 8):
+    """Retourne les derniers matchs terminés d'une league (lec, lck, msi, worlds)."""
+    from src.data.fetch_esports import get_recent_matches, get_match_games
+    matches = get_recent_matches(league, count)
+    for m in matches:
+        m["games"] = get_match_games(m["match_id"])
+    return {"league": league.upper(), "matches": matches}
+
+
+@app.get("/pro/esports-game/{esports_game_id}")
+def get_esports_game(esports_game_id: str):
+    """Analyse une game de tournoi via lolesports live stats + notre modèle."""
+    from src.data.fetch_esports import fetch_game_curve
+    result = fetch_game_curve(esports_game_id, predict_win_probability)
+    if not result:
+        raise HTTPException(404, "Game introuvable ou données live stats indisponibles")
+    return result
+
+
+# ─── Synergy / Draft ─────────────────────────────────────────────────────────
+
+_synergy_db: dict | None = None
+_roles_db: dict | None = None
+
+ROLE_DISPLAY = {
+    "TOP": "Top", "JUNGLE": "Jungle", "MIDDLE": "Mid",
+    "BOTTOM": "ADC", "UTILITY": "Support",
+}
+ROLES_ORDER = ["TOP", "JUNGLE", "MIDDLE", "BOTTOM", "UTILITY"]
+
+
+def _load_synergy():
+    global _synergy_db
+    if _synergy_db is None:
+        p = Path("data/processed/synergy_scores.json")
+        _synergy_db = json.load(open(p)) if p.exists() else {}
+    return _synergy_db
+
+
+def _load_roles():
+    global _roles_db
+    if _roles_db is None:
+        p = Path("data/processed/champion_roles.json")
+        _roles_db = json.load(open(p)) if p.exists() else {}
+    return _roles_db
+
+
+def _pair_wr(db: dict, a: str, b: str) -> float:
+    key = "|".join(sorted([a, b]))
+    entry = db.get(key)
+    return entry["winrate"] if entry else 0.5
+
+
+def _meta_ratio(roles_db: dict, champion: str, role: str) -> float:
+    """Fraction des parties jouées dans ce rôle (0–1). 0 si aucune donnée."""
+    entry = roles_db.get(champion, {})
+    total = sum(v["games"] for k, v in entry.items() if not k.startswith("_"))
+    if not total:
+        return 0.0
+    role_games = entry.get(role, {}).get("games", 0)
+    return role_games / total
+
+
+def _off_meta_penalty(ratio: float) -> float:
+    """Pénalité en points de WR (0–0.15)."""
+    if ratio >= 0.20:
+        return 0.0
+    if ratio >= 0.05:
+        return 0.05   # borderline
+    return 0.15       # vraiment off-meta
+
+
+@app.get("/champions")
+def list_champions():
+    """Liste tous les champions avec leur rôle principal."""
+    roles_db = _load_roles()
+    synergy_db = _load_synergy()
+    champs_in_synergy: set[str] = set()
+    for key in synergy_db:
+        a, b = key.split("|")
+        champs_in_synergy.add(a); champs_in_synergy.add(b)
+
+    result = {}
+    for champ in champs_in_synergy:
+        entry = roles_db.get(champ, {})
+        primary = entry.get("_primary", "MIDDLE")
+        # Rôles viables = meta_ratio >= 5%
+        total = sum(v["games"] for k, v in entry.items() if not k.startswith("_"))
+        viable = [
+            r for r in ROLES_ORDER
+            if entry.get(r, {}).get("games", 0) / max(total, 1) >= 0.05
+        ]
+        result[champ] = {"primary": primary, "viable": viable or [primary]}
+
+    return {"champions": result}
+
+
+@app.get("/synergy/{champion}")
+def get_synergy(champion: str, top: int = 10):
+    db = _load_synergy()
+    results = []
+    for key, v in db.items():
+        a, b = key.split("|")
+        if a == champion:
+            results.append({"champion": b, **v})
+        elif b == champion:
+            results.append({"champion": a, **v})
+
+    if not results:
+        raise HTTPException(404, f"Champion {champion} non trouvé dans le dataset")
+
+    results.sort(key=lambda x: -x["winrate"])
+    best  = [r for r in results if r["games"] >= 10][:top]
+    worst = sorted([r for r in results if r["games"] >= 10], key=lambda x: x["winrate"])[:top]
+    return {"champion": champion, "best": best, "worst": worst}
+
+
+class SlotInput(BaseModel):
+    champion: str
+    role: str = ""   # "TOP" | "JUNGLE" | "MIDDLE" | "BOTTOM" | "UTILITY" | ""
+
+
+class DraftInput(BaseModel):
+    blue: list[SlotInput]
+    red: list[SlotInput]
+
+
+@app.post("/draft/predict")
+def draft_predict(draft: DraftInput):
+    """
+    Prédit le win% de l'équipe bleue.
+    Prend en compte : synergie des paires + pénalité off-meta par rôle.
+    """
+    syn_db   = _load_synergy()
+    roles_db = _load_roles()
+    from itertools import combinations as _comb
+
+    def team_score(slots: list[SlotInput]) -> tuple[float, list[dict], list[dict]]:
+        champs = [s.champion for s in slots if s.champion]
+        if not champs:
+            return 0.5, [], []
+
+        # Synergie paires
+        wrs = [_pair_wr(syn_db, a, b) for a, b in _comb(champs, 2)] if len(champs) >= 2 else [0.5]
+        syn = sum(wrs) / len(wrs)
+
+        # Pénalité off-meta
+        off_meta_total = 0.0
+        off_meta_details = []
+        for s in slots:
+            if not s.champion or not s.role:
+                continue
+            ratio = _meta_ratio(roles_db, s.champion, s.role)
+            pen   = _off_meta_penalty(ratio)
+            off_meta_total += pen
+            if pen > 0:
+                off_meta_details.append({
+                    "champion": s.champion,
+                    "role": ROLE_DISPLAY.get(s.role, s.role),
+                    "meta_ratio": round(ratio * 100, 1),
+                    "penalty": round(pen * 100, 1),
+                })
+
+        avg_penalty = off_meta_total / max(len(slots), 1)
+        adjusted_syn = syn - avg_penalty
+
+        # Détail paires
+        pair_details = []
+        for a, b in _comb(champs, 2):
+            wr  = _pair_wr(syn_db, a, b)
+            key = "|".join(sorted([a, b]))
+            games = syn_db.get(key, {}).get("games", 0)
+            pair_details.append({"pair": f"{a} + {b}", "winrate": round(wr * 100, 1), "games": games})
+        pair_details.sort(key=lambda x: -x["winrate"])
+
+        return adjusted_syn, pair_details, off_meta_details
+
+    blue_syn, blue_pairs, blue_off = team_score(draft.blue)
+    red_syn,  red_pairs,  red_off  = team_score(draft.red)
+
+    raw = 0.5 + (blue_syn - red_syn) * 3.0
+    blue_prob = max(0.1, min(0.9, raw))
+
+    return {
+        "blue_win_probability": round(blue_prob * 100, 1),
+        "blue_synergy":   round(blue_syn * 100, 1),
+        "red_synergy":    round(red_syn * 100, 1),
+        "blue_pairs":     blue_pairs,
+        "red_pairs":      red_pairs,
+        "blue_off_meta":  blue_off,
+        "red_off_meta":   red_off,
+    }
+
+
+class SynergyPuzzleRequest(BaseModel):
+    team: list[str]   # 4 champions (déjà sur leurs rôles)
+    role: str         # rôle Riot du 5e : "TOP" | "JUNGLE" | "MIDDLE" | "BOTTOM" | "UTILITY"
+
+
+@app.post("/draft/puzzle")
+def draft_puzzle(req: SynergyPuzzleRequest):
+    """
+    Mini-jeu : retourne le classement des meilleurs picks pour le rôle manquant,
+    filtré sur les champions méta dans ce rôle (>= 5% de leurs games).
+    """
+    syn_db   = _load_synergy()
+    roles_db = _load_roles()
+    champs_in_team = set(req.team)
+
+    all_champs: set[str] = set()
+    for key in syn_db:
+        a, b = key.split("|")
+        all_champs.add(a); all_champs.add(b)
+
+    candidates = []
+    for c in all_champs:
+        if c in champs_in_team:
+            continue
+        ratio = _meta_ratio(roles_db, c, req.role)
+        if ratio < 0.05:
+            continue   # pas méta dans ce rôle
+        avg = sum(_pair_wr(syn_db, c, t) for t in req.team) / len(req.team)
+        candidates.append({
+            "champion": c,
+            "avg_synergy": round(avg * 100, 1),
+            "meta_ratio": round(ratio * 100, 1),
+        })
+
+    if not candidates:
+        # Fallback : pas de filtre rôle si aucun candidat
+        for c in all_champs:
+            if c in champs_in_team:
+                continue
+            avg = sum(_pair_wr(syn_db, c, t) for t in req.team) / len(req.team)
+            candidates.append({"champion": c, "avg_synergy": round(avg * 100, 1), "meta_ratio": 0.0})
+
+    candidates.sort(key=lambda x: -x["avg_synergy"])
+    return {
+        "team": req.team,
+        "role": req.role,
+        "role_display": ROLE_DISPLAY.get(req.role, req.role),
+        "answer": candidates[0]["champion"],
+        "ranking": candidates[:20],
     }

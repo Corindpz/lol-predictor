@@ -1,0 +1,3923 @@
+{
+  "Mordekaiser": {
+    "TOP": {
+      "games": 477,
+      "wins": 225,
+      "winrate": 0.4717
+    },
+    "JUNGLE": {
+      "games": 34,
+      "wins": 12,
+      "winrate": 0.3529
+    },
+    "MIDDLE": {
+      "games": 14,
+      "wins": 8,
+      "winrate": 0.5714
+    },
+    "UTILITY": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "_primary": "TOP"
+  },
+  "Graves": {
+    "JUNGLE": {
+      "games": 1016,
+      "wins": 488,
+      "winrate": 0.4803
+    },
+    "MIDDLE": {
+      "games": 12,
+      "wins": 1,
+      "winrate": 0.0833
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "TOP": {
+      "games": 13,
+      "wins": 4,
+      "winrate": 0.3077
+    },
+    "_primary": "JUNGLE"
+  },
+  "Malzahar": {
+    "MIDDLE": {
+      "games": 580,
+      "wins": 275,
+      "winrate": 0.4741
+    },
+    "BOTTOM": {
+      "games": 23,
+      "wins": 16,
+      "winrate": 0.6957
+    },
+    "TOP": {
+      "games": 26,
+      "wins": 16,
+      "winrate": 0.6154
+    },
+    "UTILITY": {
+      "games": 9,
+      "wins": 4,
+      "winrate": 0.4444
+    },
+    "JUNGLE": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "_primary": "MIDDLE"
+  },
+  "Jinx": {
+    "BOTTOM": {
+      "games": 1145,
+      "wins": 580,
+      "winrate": 0.5066
+    },
+    "TOP": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "MIDDLE": {
+      "games": 2,
+      "wins": 2,
+      "winrate": 1.0
+    },
+    "_primary": "BOTTOM"
+  },
+  "Janna": {
+    "UTILITY": {
+      "games": 552,
+      "wins": 281,
+      "winrate": 0.5091
+    },
+    "TOP": {
+      "games": 3,
+      "wins": 3,
+      "winrate": 1.0
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "UTILITY"
+  },
+  "Malphite": {
+    "TOP": {
+      "games": 716,
+      "wins": 379,
+      "winrate": 0.5293
+    },
+    "MIDDLE": {
+      "games": 88,
+      "wins": 45,
+      "winrate": 0.5114
+    },
+    "UTILITY": {
+      "games": 29,
+      "wins": 15,
+      "winrate": 0.5172
+    },
+    "JUNGLE": {
+      "games": 102,
+      "wins": 50,
+      "winrate": 0.4902
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "_primary": "TOP"
+  },
+  "Kayn": {
+    "JUNGLE": {
+      "games": 638,
+      "wins": 329,
+      "winrate": 0.5157
+    },
+    "TOP": {
+      "games": 25,
+      "wins": 10,
+      "winrate": 0.4
+    },
+    "_primary": "JUNGLE"
+  },
+  "Fizz": {
+    "MIDDLE": {
+      "games": 465,
+      "wins": 232,
+      "winrate": 0.4989
+    },
+    "JUNGLE": {
+      "games": 80,
+      "wins": 41,
+      "winrate": 0.5125
+    },
+    "TOP": {
+      "games": 14,
+      "wins": 5,
+      "winrate": 0.3571
+    },
+    "UTILITY": {
+      "games": 5,
+      "wins": 2,
+      "winrate": 0.4
+    },
+    "_primary": "MIDDLE"
+  },
+  "KogMaw": {
+    "BOTTOM": {
+      "games": 211,
+      "wins": 114,
+      "winrate": 0.5403
+    },
+    "MIDDLE": {
+      "games": 45,
+      "wins": 18,
+      "winrate": 0.4
+    },
+    "TOP": {
+      "games": 30,
+      "wins": 18,
+      "winrate": 0.6
+    },
+    "UTILITY": {
+      "games": 6,
+      "wins": 3,
+      "winrate": 0.5
+    },
+    "_primary": "BOTTOM"
+  },
+  "Braum": {
+    "UTILITY": {
+      "games": 585,
+      "wins": 276,
+      "winrate": 0.4718
+    },
+    "_primary": "UTILITY"
+  },
+  "Kayle": {
+    "TOP": {
+      "games": 294,
+      "wins": 143,
+      "winrate": 0.4864
+    },
+    "MIDDLE": {
+      "games": 106,
+      "wins": 54,
+      "winrate": 0.5094
+    },
+    "JUNGLE": {
+      "games": 5,
+      "wins": 3,
+      "winrate": 0.6
+    },
+    "UTILITY": {
+      "games": 3,
+      "wins": 2,
+      "winrate": 0.6667
+    },
+    "BOTTOM": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "_primary": "TOP"
+  },
+  "Viego": {
+    "JUNGLE": {
+      "games": 907,
+      "wins": 455,
+      "winrate": 0.5017
+    },
+    "TOP": {
+      "games": 7,
+      "wins": 4,
+      "winrate": 0.5714
+    },
+    "MIDDLE": {
+      "games": 34,
+      "wins": 12,
+      "winrate": 0.3529
+    },
+    "UTILITY": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "BOTTOM": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "_primary": "JUNGLE"
+  },
+  "Akali": {
+    "MIDDLE": {
+      "games": 652,
+      "wins": 324,
+      "winrate": 0.4969
+    },
+    "TOP": {
+      "games": 224,
+      "wins": 103,
+      "winrate": 0.4598
+    },
+    "BOTTOM": {
+      "games": 4,
+      "wins": 2,
+      "winrate": 0.5
+    },
+    "_primary": "MIDDLE"
+  },
+  "Twitch": {
+    "BOTTOM": {
+      "games": 485,
+      "wins": 258,
+      "winrate": 0.532
+    },
+    "MIDDLE": {
+      "games": 13,
+      "wins": 9,
+      "winrate": 0.6923
+    },
+    "UTILITY": {
+      "games": 17,
+      "wins": 4,
+      "winrate": 0.2353
+    },
+    "JUNGLE": {
+      "games": 12,
+      "wins": 7,
+      "winrate": 0.5833
+    },
+    "TOP": {
+      "games": 5,
+      "wins": 3,
+      "winrate": 0.6
+    },
+    "_primary": "BOTTOM"
+  },
+  "Karma": {
+    "UTILITY": {
+      "games": 992,
+      "wins": 493,
+      "winrate": 0.497
+    },
+    "TOP": {
+      "games": 44,
+      "wins": 18,
+      "winrate": 0.4091
+    },
+    "MIDDLE": {
+      "games": 26,
+      "wins": 13,
+      "winrate": 0.5
+    },
+    "BOTTOM": {
+      "games": 3,
+      "wins": 2,
+      "winrate": 0.6667
+    },
+    "_primary": "UTILITY"
+  },
+  "Renekton": {
+    "TOP": {
+      "games": 457,
+      "wins": 235,
+      "winrate": 0.5142
+    },
+    "UTILITY": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "MIDDLE": {
+      "games": 21,
+      "wins": 12,
+      "winrate": 0.5714
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "TOP"
+  },
+  "XinZhao": {
+    "JUNGLE": {
+      "games": 521,
+      "wins": 247,
+      "winrate": 0.4741
+    },
+    "TOP": {
+      "games": 115,
+      "wins": 62,
+      "winrate": 0.5391
+    },
+    "MIDDLE": {
+      "games": 111,
+      "wins": 58,
+      "winrate": 0.5225
+    },
+    "UTILITY": {
+      "games": 6,
+      "wins": 1,
+      "winrate": 0.1667
+    },
+    "BOTTOM": {
+      "games": 5,
+      "wins": 4,
+      "winrate": 0.8
+    },
+    "_primary": "JUNGLE"
+  },
+  "Syndra": {
+    "MIDDLE": {
+      "games": 706,
+      "wins": 356,
+      "winrate": 0.5042
+    },
+    "TOP": {
+      "games": 10,
+      "wins": 10,
+      "winrate": 1.0
+    },
+    "UTILITY": {
+      "games": 7,
+      "wins": 1,
+      "winrate": 0.1429
+    },
+    "BOTTOM": {
+      "games": 74,
+      "wins": 44,
+      "winrate": 0.5946
+    },
+    "_primary": "MIDDLE"
+  },
+  "Yunara": {
+    "BOTTOM": {
+      "games": 679,
+      "wins": 333,
+      "winrate": 0.4904
+    },
+    "JUNGLE": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "MIDDLE": {
+      "games": 5,
+      "wins": 1,
+      "winrate": 0.2
+    },
+    "TOP": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "_primary": "BOTTOM"
+  },
+  "Lulu": {
+    "UTILITY": {
+      "games": 941,
+      "wins": 456,
+      "winrate": 0.4846
+    },
+    "TOP": {
+      "games": 4,
+      "wins": 4,
+      "winrate": 1.0
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "MIDDLE": {
+      "games": 3,
+      "wins": 1,
+      "winrate": 0.3333
+    },
+    "_primary": "UTILITY"
+  },
+  "Udyr": {
+    "JUNGLE": {
+      "games": 251,
+      "wins": 112,
+      "winrate": 0.4462
+    },
+    "TOP": {
+      "games": 69,
+      "wins": 30,
+      "winrate": 0.4348
+    },
+    "MIDDLE": {
+      "games": 3,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "JUNGLE"
+  },
+  "Veigar": {
+    "MIDDLE": {
+      "games": 399,
+      "wins": 198,
+      "winrate": 0.4962
+    },
+    "BOTTOM": {
+      "games": 125,
+      "wins": 65,
+      "winrate": 0.52
+    },
+    "UTILITY": {
+      "games": 30,
+      "wins": 15,
+      "winrate": 0.5
+    },
+    "TOP": {
+      "games": 23,
+      "wins": 15,
+      "winrate": 0.6522
+    },
+    "_primary": "MIDDLE"
+  },
+  "Lucian": {
+    "BOTTOM": {
+      "games": 532,
+      "wins": 257,
+      "winrate": 0.4831
+    },
+    "MIDDLE": {
+      "games": 19,
+      "wins": 9,
+      "winrate": 0.4737
+    },
+    "TOP": {
+      "games": 8,
+      "wins": 4,
+      "winrate": 0.5
+    },
+    "UTILITY": {
+      "games": 3,
+      "wins": 1,
+      "winrate": 0.3333
+    },
+    "_primary": "BOTTOM"
+  },
+  "Taric": {
+    "UTILITY": {
+      "games": 163,
+      "wins": 82,
+      "winrate": 0.5031
+    },
+    "TOP": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "JUNGLE": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "_primary": "UTILITY"
+  },
+  "Brand": {
+    "JUNGLE": {
+      "games": 105,
+      "wins": 50,
+      "winrate": 0.4762
+    },
+    "MIDDLE": {
+      "games": 147,
+      "wins": 73,
+      "winrate": 0.4966
+    },
+    "BOTTOM": {
+      "games": 270,
+      "wins": 136,
+      "winrate": 0.5037
+    },
+    "UTILITY": {
+      "games": 301,
+      "wins": 142,
+      "winrate": 0.4718
+    },
+    "TOP": {
+      "games": 51,
+      "wins": 24,
+      "winrate": 0.4706
+    },
+    "_primary": "UTILITY"
+  },
+  "Corki": {
+    "BOTTOM": {
+      "games": 323,
+      "wins": 155,
+      "winrate": 0.4799
+    },
+    "MIDDLE": {
+      "games": 38,
+      "wins": 18,
+      "winrate": 0.4737
+    },
+    "TOP": {
+      "games": 15,
+      "wins": 4,
+      "winrate": 0.2667
+    },
+    "_primary": "BOTTOM"
+  },
+  "Nami": {
+    "UTILITY": {
+      "games": 1496,
+      "wins": 756,
+      "winrate": 0.5053
+    },
+    "TOP": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "_primary": "UTILITY"
+  },
+  "Shyvana": {
+    "JUNGLE": {
+      "games": 540,
+      "wins": 263,
+      "winrate": 0.487
+    },
+    "MIDDLE": {
+      "games": 2,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "TOP": {
+      "games": 65,
+      "wins": 28,
+      "winrate": 0.4308
+    },
+    "_primary": "JUNGLE"
+  },
+  "Leblanc": {
+    "MIDDLE": {
+      "games": 391,
+      "wins": 184,
+      "winrate": 0.4706
+    },
+    "UTILITY": {
+      "games": 36,
+      "wins": 23,
+      "winrate": 0.6389
+    },
+    "TOP": {
+      "games": 13,
+      "wins": 6,
+      "winrate": 0.4615
+    },
+    "JUNGLE": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "BOTTOM": {
+      "games": 3,
+      "wins": 1,
+      "winrate": 0.3333
+    },
+    "_primary": "MIDDLE"
+  },
+  "Milio": {
+    "UTILITY": {
+      "games": 589,
+      "wins": 296,
+      "winrate": 0.5025
+    },
+    "_primary": "UTILITY"
+  },
+  "Rumble": {
+    "TOP": {
+      "games": 249,
+      "wins": 123,
+      "winrate": 0.494
+    },
+    "MIDDLE": {
+      "games": 46,
+      "wins": 21,
+      "winrate": 0.4565
+    },
+    "JUNGLE": {
+      "games": 18,
+      "wins": 7,
+      "winrate": 0.3889
+    },
+    "UTILITY": {
+      "games": 3,
+      "wins": 2,
+      "winrate": 0.6667
+    },
+    "_primary": "TOP"
+  },
+  "Annie": {
+    "MIDDLE": {
+      "games": 321,
+      "wins": 149,
+      "winrate": 0.4642
+    },
+    "UTILITY": {
+      "games": 39,
+      "wins": 23,
+      "winrate": 0.5897
+    },
+    "TOP": {
+      "games": 36,
+      "wins": 17,
+      "winrate": 0.4722
+    },
+    "BOTTOM": {
+      "games": 12,
+      "wins": 9,
+      "winrate": 0.75
+    },
+    "_primary": "MIDDLE"
+  },
+  "Vayne": {
+    "BOTTOM": {
+      "games": 600,
+      "wins": 298,
+      "winrate": 0.4967
+    },
+    "TOP": {
+      "games": 459,
+      "wins": 222,
+      "winrate": 0.4837
+    },
+    "MIDDLE": {
+      "games": 26,
+      "wins": 13,
+      "winrate": 0.5
+    },
+    "JUNGLE": {
+      "games": 25,
+      "wins": 14,
+      "winrate": 0.56
+    },
+    "UTILITY": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "BOTTOM"
+  },
+  "Vi": {
+    "UTILITY": {
+      "games": 6,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "JUNGLE": {
+      "games": 384,
+      "wins": 199,
+      "winrate": 0.5182
+    },
+    "MIDDLE": {
+      "games": 9,
+      "wins": 5,
+      "winrate": 0.5556
+    },
+    "TOP": {
+      "games": 16,
+      "wins": 8,
+      "winrate": 0.5
+    },
+    "_primary": "JUNGLE"
+  },
+  "Varus": {
+    "TOP": {
+      "games": 338,
+      "wins": 187,
+      "winrate": 0.5533
+    },
+    "BOTTOM": {
+      "games": 411,
+      "wins": 200,
+      "winrate": 0.4866
+    },
+    "MIDDLE": {
+      "games": 23,
+      "wins": 8,
+      "winrate": 0.3478
+    },
+    "UTILITY": {
+      "games": 3,
+      "wins": 2,
+      "winrate": 0.6667
+    },
+    "_primary": "BOTTOM"
+  },
+  "Sejuani": {
+    "JUNGLE": {
+      "games": 152,
+      "wins": 82,
+      "winrate": 0.5395
+    },
+    "TOP": {
+      "games": 26,
+      "wins": 13,
+      "winrate": 0.5
+    },
+    "MIDDLE": {
+      "games": 4,
+      "wins": 3,
+      "winrate": 0.75
+    },
+    "UTILITY": {
+      "games": 5,
+      "wins": 3,
+      "winrate": 0.6
+    },
+    "_primary": "JUNGLE"
+  },
+  "Zeri": {
+    "BOTTOM": {
+      "games": 539,
+      "wins": 266,
+      "winrate": 0.4935
+    },
+    "TOP": {
+      "games": 13,
+      "wins": 3,
+      "winrate": 0.2308
+    },
+    "MIDDLE": {
+      "games": 13,
+      "wins": 6,
+      "winrate": 0.4615
+    },
+    "JUNGLE": {
+      "games": 5,
+      "wins": 2,
+      "winrate": 0.4
+    },
+    "UTILITY": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "BOTTOM"
+  },
+  "KSante": {
+    "TOP": {
+      "games": 353,
+      "wins": 166,
+      "winrate": 0.4703
+    },
+    "UTILITY": {
+      "games": 7,
+      "wins": 4,
+      "winrate": 0.5714
+    },
+    "MIDDLE": {
+      "games": 16,
+      "wins": 9,
+      "winrate": 0.5625
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "_primary": "TOP"
+  },
+  "Khazix": {
+    "JUNGLE": {
+      "games": 697,
+      "wins": 347,
+      "winrate": 0.4978
+    },
+    "TOP": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "_primary": "JUNGLE"
+  },
+  "Smolder": {
+    "BOTTOM": {
+      "games": 1497,
+      "wins": 788,
+      "winrate": 0.5264
+    },
+    "MIDDLE": {
+      "games": 98,
+      "wins": 42,
+      "winrate": 0.4286
+    },
+    "TOP": {
+      "games": 56,
+      "wins": 31,
+      "winrate": 0.5536
+    },
+    "_primary": "BOTTOM"
+  },
+  "Lux": {
+    "UTILITY": {
+      "games": 523,
+      "wins": 263,
+      "winrate": 0.5029
+    },
+    "MIDDLE": {
+      "games": 353,
+      "wins": 183,
+      "winrate": 0.5184
+    },
+    "BOTTOM": {
+      "games": 98,
+      "wins": 60,
+      "winrate": 0.6122
+    },
+    "TOP": {
+      "games": 4,
+      "wins": 4,
+      "winrate": 1.0
+    },
+    "_primary": "UTILITY"
+  },
+  "Ornn": {
+    "TOP": {
+      "games": 603,
+      "wins": 306,
+      "winrate": 0.5075
+    },
+    "UTILITY": {
+      "games": 11,
+      "wins": 5,
+      "winrate": 0.4545
+    },
+    "MIDDLE": {
+      "games": 11,
+      "wins": 6,
+      "winrate": 0.5455
+    },
+    "JUNGLE": {
+      "games": 10,
+      "wins": 9,
+      "winrate": 0.9
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "TOP"
+  },
+  "Naafiri": {
+    "JUNGLE": {
+      "games": 553,
+      "wins": 280,
+      "winrate": 0.5063
+    },
+    "TOP": {
+      "games": 56,
+      "wins": 24,
+      "winrate": 0.4286
+    },
+    "MIDDLE": {
+      "games": 260,
+      "wins": 133,
+      "winrate": 0.5115
+    },
+    "UTILITY": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "BOTTOM": {
+      "games": 7,
+      "wins": 5,
+      "winrate": 0.7143
+    },
+    "_primary": "JUNGLE"
+  },
+  "Neeko": {
+    "MIDDLE": {
+      "games": 44,
+      "wins": 24,
+      "winrate": 0.5455
+    },
+    "UTILITY": {
+      "games": 266,
+      "wins": 140,
+      "winrate": 0.5263
+    },
+    "JUNGLE": {
+      "games": 12,
+      "wins": 2,
+      "winrate": 0.1667
+    },
+    "BOTTOM": {
+      "games": 3,
+      "wins": 2,
+      "winrate": 0.6667
+    },
+    "TOP": {
+      "games": 9,
+      "wins": 3,
+      "winrate": 0.3333
+    },
+    "_primary": "UTILITY"
+  },
+  "Sivir": {
+    "BOTTOM": {
+      "games": 362,
+      "wins": 171,
+      "winrate": 0.4724
+    },
+    "MIDDLE": {
+      "games": 4,
+      "wins": 1,
+      "winrate": 0.25
+    },
+    "_primary": "BOTTOM"
+  },
+  "Talon": {
+    "JUNGLE": {
+      "games": 758,
+      "wins": 414,
+      "winrate": 0.5462
+    },
+    "MIDDLE": {
+      "games": 170,
+      "wins": 73,
+      "winrate": 0.4294
+    },
+    "TOP": {
+      "games": 13,
+      "wins": 5,
+      "winrate": 0.3846
+    },
+    "UTILITY": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "_primary": "JUNGLE"
+  },
+  "Kassadin": {
+    "MIDDLE": {
+      "games": 353,
+      "wins": 176,
+      "winrate": 0.4986
+    },
+    "TOP": {
+      "games": 14,
+      "wins": 9,
+      "winrate": 0.6429
+    },
+    "JUNGLE": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "MIDDLE"
+  },
+  "Ezreal": {
+    "BOTTOM": {
+      "games": 1590,
+      "wins": 771,
+      "winrate": 0.4849
+    },
+    "UTILITY": {
+      "games": 13,
+      "wins": 1,
+      "winrate": 0.0769
+    },
+    "JUNGLE": {
+      "games": 10,
+      "wins": 3,
+      "winrate": 0.3
+    },
+    "MIDDLE": {
+      "games": 66,
+      "wins": 25,
+      "winrate": 0.3788
+    },
+    "TOP": {
+      "games": 26,
+      "wins": 8,
+      "winrate": 0.3077
+    },
+    "_primary": "BOTTOM"
+  },
+  "TahmKench": {
+    "TOP": {
+      "games": 219,
+      "wins": 100,
+      "winrate": 0.4566
+    },
+    "UTILITY": {
+      "games": 244,
+      "wins": 138,
+      "winrate": 0.5656
+    },
+    "BOTTOM": {
+      "games": 39,
+      "wins": 20,
+      "winrate": 0.5128
+    },
+    "MIDDLE": {
+      "games": 19,
+      "wins": 9,
+      "winrate": 0.4737
+    },
+    "_primary": "UTILITY"
+  },
+  "Rengar": {
+    "JUNGLE": {
+      "games": 502,
+      "wins": 239,
+      "winrate": 0.4761
+    },
+    "UTILITY": {
+      "games": 4,
+      "wins": 1,
+      "winrate": 0.25
+    },
+    "TOP": {
+      "games": 17,
+      "wins": 13,
+      "winrate": 0.7647
+    },
+    "BOTTOM": {
+      "games": 5,
+      "wins": 2,
+      "winrate": 0.4
+    },
+    "_primary": "JUNGLE"
+  },
+  "Sylas": {
+    "MIDDLE": {
+      "games": 572,
+      "wins": 297,
+      "winrate": 0.5192
+    },
+    "JUNGLE": {
+      "games": 487,
+      "wins": 255,
+      "winrate": 0.5236
+    },
+    "TOP": {
+      "games": 109,
+      "wins": 63,
+      "winrate": 0.578
+    },
+    "UTILITY": {
+      "games": 74,
+      "wins": 33,
+      "winrate": 0.4459
+    },
+    "BOTTOM": {
+      "games": 4,
+      "wins": 3,
+      "winrate": 0.75
+    },
+    "_primary": "MIDDLE"
+  },
+  "Nautilus": {
+    "UTILITY": {
+      "games": 1150,
+      "wins": 567,
+      "winrate": 0.493
+    },
+    "JUNGLE": {
+      "games": 6,
+      "wins": 3,
+      "winrate": 0.5
+    },
+    "TOP": {
+      "games": 7,
+      "wins": 3,
+      "winrate": 0.4286
+    },
+    "MIDDLE": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "UTILITY"
+  },
+  "Volibear": {
+    "TOP": {
+      "games": 223,
+      "wins": 102,
+      "winrate": 0.4574
+    },
+    "JUNGLE": {
+      "games": 213,
+      "wins": 103,
+      "winrate": 0.4836
+    },
+    "MIDDLE": {
+      "games": 5,
+      "wins": 1,
+      "winrate": 0.2
+    },
+    "_primary": "TOP"
+  },
+  "Elise": {
+    "JUNGLE": {
+      "games": 278,
+      "wins": 139,
+      "winrate": 0.5
+    },
+    "UTILITY": {
+      "games": 152,
+      "wins": 67,
+      "winrate": 0.4408
+    },
+    "TOP": {
+      "games": 27,
+      "wins": 12,
+      "winrate": 0.4444
+    },
+    "MIDDLE": {
+      "games": 5,
+      "wins": 5,
+      "winrate": 1.0
+    },
+    "_primary": "JUNGLE"
+  },
+  "Katarina": {
+    "MIDDLE": {
+      "games": 768,
+      "wins": 374,
+      "winrate": 0.487
+    },
+    "JUNGLE": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "TOP": {
+      "games": 18,
+      "wins": 8,
+      "winrate": 0.4444
+    },
+    "BOTTOM": {
+      "games": 52,
+      "wins": 24,
+      "winrate": 0.4615
+    },
+    "UTILITY": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "_primary": "MIDDLE"
+  },
+  "AurelionSol": {
+    "TOP": {
+      "games": 30,
+      "wins": 22,
+      "winrate": 0.7333
+    },
+    "MIDDLE": {
+      "games": 228,
+      "wins": 126,
+      "winrate": 0.5526
+    },
+    "BOTTOM": {
+      "games": 106,
+      "wins": 48,
+      "winrate": 0.4528
+    },
+    "JUNGLE": {
+      "games": 5,
+      "wins": 3,
+      "winrate": 0.6
+    },
+    "UTILITY": {
+      "games": 3,
+      "wins": 2,
+      "winrate": 0.6667
+    },
+    "_primary": "MIDDLE"
+  },
+  "Qiyana": {
+    "MIDDLE": {
+      "games": 323,
+      "wins": 176,
+      "winrate": 0.5449
+    },
+    "TOP": {
+      "games": 30,
+      "wins": 20,
+      "winrate": 0.6667
+    },
+    "JUNGLE": {
+      "games": 250,
+      "wins": 126,
+      "winrate": 0.504
+    },
+    "UTILITY": {
+      "games": 3,
+      "wins": 2,
+      "winrate": 0.6667
+    },
+    "BOTTOM": {
+      "games": 9,
+      "wins": 6,
+      "winrate": 0.6667
+    },
+    "_primary": "MIDDLE"
+  },
+  "Senna": {
+    "BOTTOM": {
+      "games": 526,
+      "wins": 259,
+      "winrate": 0.4924
+    },
+    "UTILITY": {
+      "games": 894,
+      "wins": 453,
+      "winrate": 0.5067
+    },
+    "MIDDLE": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "TOP": {
+      "games": 7,
+      "wins": 5,
+      "winrate": 0.7143
+    },
+    "_primary": "UTILITY"
+  },
+  "Gragas": {
+    "TOP": {
+      "games": 247,
+      "wins": 128,
+      "winrate": 0.5182
+    },
+    "JUNGLE": {
+      "games": 43,
+      "wins": 27,
+      "winrate": 0.6279
+    },
+    "MIDDLE": {
+      "games": 25,
+      "wins": 16,
+      "winrate": 0.64
+    },
+    "UTILITY": {
+      "games": 22,
+      "wins": 12,
+      "winrate": 0.5455
+    },
+    "_primary": "TOP"
+  },
+  "Zed": {
+    "JUNGLE": {
+      "games": 219,
+      "wins": 92,
+      "winrate": 0.4201
+    },
+    "MIDDLE": {
+      "games": 740,
+      "wins": 365,
+      "winrate": 0.4932
+    },
+    "TOP": {
+      "games": 68,
+      "wins": 39,
+      "winrate": 0.5735
+    },
+    "UTILITY": {
+      "games": 5,
+      "wins": 4,
+      "winrate": 0.8
+    },
+    "BOTTOM": {
+      "games": 2,
+      "wins": 2,
+      "winrate": 1.0
+    },
+    "_primary": "MIDDLE"
+  },
+  "Seraphine": {
+    "UTILITY": {
+      "games": 915,
+      "wins": 489,
+      "winrate": 0.5344
+    },
+    "MIDDLE": {
+      "games": 33,
+      "wins": 16,
+      "winrate": 0.4848
+    },
+    "BOTTOM": {
+      "games": 129,
+      "wins": 69,
+      "winrate": 0.5349
+    },
+    "TOP": {
+      "games": 2,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "UTILITY"
+  },
+  "Nocturne": {
+    "JUNGLE": {
+      "games": 641,
+      "wins": 321,
+      "winrate": 0.5008
+    },
+    "MIDDLE": {
+      "games": 3,
+      "wins": 2,
+      "winrate": 0.6667
+    },
+    "TOP": {
+      "games": 6,
+      "wins": 3,
+      "winrate": 0.5
+    },
+    "_primary": "JUNGLE"
+  },
+  "Briar": {
+    "TOP": {
+      "games": 21,
+      "wins": 14,
+      "winrate": 0.6667
+    },
+    "JUNGLE": {
+      "games": 422,
+      "wins": 213,
+      "winrate": 0.5047
+    },
+    "MIDDLE": {
+      "games": 14,
+      "wins": 5,
+      "winrate": 0.3571
+    },
+    "UTILITY": {
+      "games": 5,
+      "wins": 3,
+      "winrate": 0.6
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "JUNGLE"
+  },
+  "Swain": {
+    "BOTTOM": {
+      "games": 156,
+      "wins": 78,
+      "winrate": 0.5
+    },
+    "UTILITY": {
+      "games": 216,
+      "wins": 105,
+      "winrate": 0.4861
+    },
+    "TOP": {
+      "games": 63,
+      "wins": 28,
+      "winrate": 0.4444
+    },
+    "MIDDLE": {
+      "games": 72,
+      "wins": 45,
+      "winrate": 0.625
+    },
+    "_primary": "UTILITY"
+  },
+  "Darius": {
+    "TOP": {
+      "games": 575,
+      "wins": 276,
+      "winrate": 0.48
+    },
+    "JUNGLE": {
+      "games": 79,
+      "wins": 45,
+      "winrate": 0.5696
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "MIDDLE": {
+      "games": 13,
+      "wins": 5,
+      "winrate": 0.3846
+    },
+    "UTILITY": {
+      "games": 2,
+      "wins": 2,
+      "winrate": 1.0
+    },
+    "_primary": "TOP"
+  },
+  "Ekko": {
+    "MIDDLE": {
+      "games": 418,
+      "wins": 225,
+      "winrate": 0.5383
+    },
+    "JUNGLE": {
+      "games": 342,
+      "wins": 163,
+      "winrate": 0.4766
+    },
+    "UTILITY": {
+      "games": 7,
+      "wins": 3,
+      "winrate": 0.4286
+    },
+    "TOP": {
+      "games": 19,
+      "wins": 9,
+      "winrate": 0.4737
+    },
+    "BOTTOM": {
+      "games": 10,
+      "wins": 6,
+      "winrate": 0.6
+    },
+    "_primary": "MIDDLE"
+  },
+  "Sona": {
+    "UTILITY": {
+      "games": 474,
+      "wins": 230,
+      "winrate": 0.4852
+    },
+    "TOP": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "MIDDLE": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "_primary": "UTILITY"
+  },
+  "Gnar": {
+    "TOP": {
+      "games": 399,
+      "wins": 181,
+      "winrate": 0.4536
+    },
+    "MIDDLE": {
+      "games": 3,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "JUNGLE": {
+      "games": 4,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "TOP"
+  },
+  "JarvanIV": {
+    "JUNGLE": {
+      "games": 752,
+      "wins": 373,
+      "winrate": 0.496
+    },
+    "BOTTOM": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "UTILITY": {
+      "games": 16,
+      "wins": 12,
+      "winrate": 0.75
+    },
+    "MIDDLE": {
+      "games": 5,
+      "wins": 3,
+      "winrate": 0.6
+    },
+    "TOP": {
+      "games": 4,
+      "wins": 2,
+      "winrate": 0.5
+    },
+    "_primary": "JUNGLE"
+  },
+  "Ashe": {
+    "BOTTOM": {
+      "games": 1297,
+      "wins": 653,
+      "winrate": 0.5035
+    },
+    "UTILITY": {
+      "games": 57,
+      "wins": 24,
+      "winrate": 0.4211
+    },
+    "MIDDLE": {
+      "games": 6,
+      "wins": 5,
+      "winrate": 0.8333
+    },
+    "JUNGLE": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "TOP": {
+      "games": 7,
+      "wins": 4,
+      "winrate": 0.5714
+    },
+    "_primary": "BOTTOM"
+  },
+  "Soraka": {
+    "UTILITY": {
+      "games": 554,
+      "wins": 288,
+      "winrate": 0.5199
+    },
+    "TOP": {
+      "games": 9,
+      "wins": 6,
+      "winrate": 0.6667
+    },
+    "MIDDLE": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "BOTTOM": {
+      "games": 8,
+      "wins": 3,
+      "winrate": 0.375
+    },
+    "_primary": "UTILITY"
+  },
+  "Diana": {
+    "JUNGLE": {
+      "games": 412,
+      "wins": 192,
+      "winrate": 0.466
+    },
+    "MIDDLE": {
+      "games": 309,
+      "wins": 160,
+      "winrate": 0.5178
+    },
+    "TOP": {
+      "games": 9,
+      "wins": 6,
+      "winrate": 0.6667
+    },
+    "UTILITY": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "_primary": "JUNGLE"
+  },
+  "Tristana": {
+    "BOTTOM": {
+      "games": 426,
+      "wins": 199,
+      "winrate": 0.4671
+    },
+    "TOP": {
+      "games": 22,
+      "wins": 10,
+      "winrate": 0.4545
+    },
+    "MIDDLE": {
+      "games": 51,
+      "wins": 25,
+      "winrate": 0.4902
+    },
+    "JUNGLE": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "UTILITY": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "BOTTOM"
+  },
+  "Garen": {
+    "TOP": {
+      "games": 774,
+      "wins": 401,
+      "winrate": 0.5181
+    },
+    "MIDDLE": {
+      "games": 43,
+      "wins": 17,
+      "winrate": 0.3953
+    },
+    "BOTTOM": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "JUNGLE": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "_primary": "TOP"
+  },
+  "Zac": {
+    "JUNGLE": {
+      "games": 190,
+      "wins": 96,
+      "winrate": 0.5053
+    },
+    "TOP": {
+      "games": 45,
+      "wins": 20,
+      "winrate": 0.4444
+    },
+    "MIDDLE": {
+      "games": 14,
+      "wins": 6,
+      "winrate": 0.4286
+    },
+    "UTILITY": {
+      "games": 15,
+      "wins": 6,
+      "winrate": 0.4
+    },
+    "_primary": "JUNGLE"
+  },
+  "Anivia": {
+    "MIDDLE": {
+      "games": 346,
+      "wins": 173,
+      "winrate": 0.5
+    },
+    "TOP": {
+      "games": 181,
+      "wins": 98,
+      "winrate": 0.5414
+    },
+    "BOTTOM": {
+      "games": 15,
+      "wins": 7,
+      "winrate": 0.4667
+    },
+    "UTILITY": {
+      "games": 72,
+      "wins": 41,
+      "winrate": 0.5694
+    },
+    "_primary": "MIDDLE"
+  },
+  "Caitlyn": {
+    "BOTTOM": {
+      "games": 1435,
+      "wins": 721,
+      "winrate": 0.5024
+    },
+    "MIDDLE": {
+      "games": 4,
+      "wins": 3,
+      "winrate": 0.75
+    },
+    "TOP": {
+      "games": 6,
+      "wins": 3,
+      "winrate": 0.5
+    },
+    "_primary": "BOTTOM"
+  },
+  "Poppy": {
+    "UTILITY": {
+      "games": 172,
+      "wins": 85,
+      "winrate": 0.4942
+    },
+    "JUNGLE": {
+      "games": 59,
+      "wins": 30,
+      "winrate": 0.5085
+    },
+    "MIDDLE": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "TOP": {
+      "games": 99,
+      "wins": 51,
+      "winrate": 0.5152
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "UTILITY"
+  },
+  "Galio": {
+    "MIDDLE": {
+      "games": 330,
+      "wins": 171,
+      "winrate": 0.5182
+    },
+    "UTILITY": {
+      "games": 113,
+      "wins": 54,
+      "winrate": 0.4779
+    },
+    "TOP": {
+      "games": 12,
+      "wins": 9,
+      "winrate": 0.75
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "MIDDLE"
+  },
+  "Vex": {
+    "MIDDLE": {
+      "games": 261,
+      "wins": 155,
+      "winrate": 0.5939
+    },
+    "TOP": {
+      "games": 9,
+      "wins": 4,
+      "winrate": 0.4444
+    },
+    "BOTTOM": {
+      "games": 4,
+      "wins": 1,
+      "winrate": 0.25
+    },
+    "UTILITY": {
+      "games": 3,
+      "wins": 1,
+      "winrate": 0.3333
+    },
+    "_primary": "MIDDLE"
+  },
+  "Aphelios": {
+    "BOTTOM": {
+      "games": 399,
+      "wins": 192,
+      "winrate": 0.4812
+    },
+    "MIDDLE": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "TOP": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "_primary": "BOTTOM"
+  },
+  "Lillia": {
+    "JUNGLE": {
+      "games": 277,
+      "wins": 143,
+      "winrate": 0.5162
+    },
+    "TOP": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "JUNGLE"
+  },
+  "Jhin": {
+    "BOTTOM": {
+      "games": 1340,
+      "wins": 675,
+      "winrate": 0.5037
+    },
+    "MIDDLE": {
+      "games": 12,
+      "wins": 5,
+      "winrate": 0.4167
+    },
+    "UTILITY": {
+      "games": 2,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "TOP": {
+      "games": 8,
+      "wins": 4,
+      "winrate": 0.5
+    },
+    "JUNGLE": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "_primary": "BOTTOM"
+  },
+  "Zilean": {
+    "UTILITY": {
+      "games": 360,
+      "wins": 192,
+      "winrate": 0.5333
+    },
+    "TOP": {
+      "games": 48,
+      "wins": 24,
+      "winrate": 0.5
+    },
+    "BOTTOM": {
+      "games": 11,
+      "wins": 6,
+      "winrate": 0.5455
+    },
+    "MIDDLE": {
+      "games": 76,
+      "wins": 46,
+      "winrate": 0.6053
+    },
+    "_primary": "UTILITY"
+  },
+  "Ahri": {
+    "MIDDLE": {
+      "games": 1066,
+      "wins": 537,
+      "winrate": 0.5038
+    },
+    "UTILITY": {
+      "games": 8,
+      "wins": 4,
+      "winrate": 0.5
+    },
+    "TOP": {
+      "games": 28,
+      "wins": 17,
+      "winrate": 0.6071
+    },
+    "BOTTOM": {
+      "games": 3,
+      "wins": 2,
+      "winrate": 0.6667
+    },
+    "JUNGLE": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "MIDDLE"
+  },
+  "Fiora": {
+    "TOP": {
+      "games": 367,
+      "wins": 190,
+      "winrate": 0.5177
+    },
+    "MIDDLE": {
+      "games": 11,
+      "wins": 6,
+      "winrate": 0.5455
+    },
+    "BOTTOM": {
+      "games": 20,
+      "wins": 12,
+      "winrate": 0.6
+    },
+    "UTILITY": {
+      "games": 6,
+      "wins": 4,
+      "winrate": 0.6667
+    },
+    "_primary": "TOP"
+  },
+  "Kindred": {
+    "JUNGLE": {
+      "games": 289,
+      "wins": 156,
+      "winrate": 0.5398
+    },
+    "BOTTOM": {
+      "games": 3,
+      "wins": 1,
+      "winrate": 0.3333
+    },
+    "MIDDLE": {
+      "games": 6,
+      "wins": 4,
+      "winrate": 0.6667
+    },
+    "TOP": {
+      "games": 5,
+      "wins": 4,
+      "winrate": 0.8
+    },
+    "_primary": "JUNGLE"
+  },
+  "Camille": {
+    "UTILITY": {
+      "games": 132,
+      "wins": 60,
+      "winrate": 0.4545
+    },
+    "TOP": {
+      "games": 379,
+      "wins": 180,
+      "winrate": 0.4749
+    },
+    "MIDDLE": {
+      "games": 9,
+      "wins": 7,
+      "winrate": 0.7778
+    },
+    "JUNGLE": {
+      "games": 16,
+      "wins": 10,
+      "winrate": 0.625
+    },
+    "_primary": "TOP"
+  },
+  "Nunu": {
+    "JUNGLE": {
+      "games": 255,
+      "wins": 122,
+      "winrate": 0.4784
+    },
+    "MIDDLE": {
+      "games": 39,
+      "wins": 22,
+      "winrate": 0.5641
+    },
+    "TOP": {
+      "games": 5,
+      "wins": 1,
+      "winrate": 0.2
+    },
+    "UTILITY": {
+      "games": 16,
+      "wins": 5,
+      "winrate": 0.3125
+    },
+    "BOTTOM": {
+      "games": 2,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "JUNGLE"
+  },
+  "Mel": {
+    "UTILITY": {
+      "games": 110,
+      "wins": 47,
+      "winrate": 0.4273
+    },
+    "BOTTOM": {
+      "games": 149,
+      "wins": 71,
+      "winrate": 0.4765
+    },
+    "MIDDLE": {
+      "games": 330,
+      "wins": 157,
+      "winrate": 0.4758
+    },
+    "TOP": {
+      "games": 8,
+      "wins": 4,
+      "winrate": 0.5
+    },
+    "_primary": "MIDDLE"
+  },
+  "MonkeyKing": {
+    "JUNGLE": {
+      "games": 385,
+      "wins": 185,
+      "winrate": 0.4805
+    },
+    "TOP": {
+      "games": 62,
+      "wins": 25,
+      "winrate": 0.4032
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "UTILITY": {
+      "games": 3,
+      "wins": 2,
+      "winrate": 0.6667
+    },
+    "MIDDLE": {
+      "games": 2,
+      "wins": 2,
+      "winrate": 1.0
+    },
+    "_primary": "JUNGLE"
+  },
+  "Yasuo": {
+    "TOP": {
+      "games": 240,
+      "wins": 116,
+      "winrate": 0.4833
+    },
+    "MIDDLE": {
+      "games": 702,
+      "wins": 360,
+      "winrate": 0.5128
+    },
+    "BOTTOM": {
+      "games": 204,
+      "wins": 100,
+      "winrate": 0.4902
+    },
+    "JUNGLE": {
+      "games": 3,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "UTILITY": {
+      "games": 2,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "MIDDLE"
+  },
+  "Jax": {
+    "TOP": {
+      "games": 514,
+      "wins": 263,
+      "winrate": 0.5117
+    },
+    "JUNGLE": {
+      "games": 183,
+      "wins": 92,
+      "winrate": 0.5027
+    },
+    "UTILITY": {
+      "games": 5,
+      "wins": 4,
+      "winrate": 0.8
+    },
+    "MIDDLE": {
+      "games": 14,
+      "wins": 5,
+      "winrate": 0.3571
+    },
+    "_primary": "TOP"
+  },
+  "FiddleSticks": {
+    "JUNGLE": {
+      "games": 255,
+      "wins": 128,
+      "winrate": 0.502
+    },
+    "UTILITY": {
+      "games": 52,
+      "wins": 30,
+      "winrate": 0.5769
+    },
+    "TOP": {
+      "games": 42,
+      "wins": 19,
+      "winrate": 0.4524
+    },
+    "MIDDLE": {
+      "games": 6,
+      "wins": 1,
+      "winrate": 0.1667
+    },
+    "_primary": "JUNGLE"
+  },
+  "Shen": {
+    "JUNGLE": {
+      "games": 87,
+      "wins": 44,
+      "winrate": 0.5057
+    },
+    "TOP": {
+      "games": 386,
+      "wins": 197,
+      "winrate": 0.5104
+    },
+    "MIDDLE": {
+      "games": 15,
+      "wins": 11,
+      "winrate": 0.7333
+    },
+    "UTILITY": {
+      "games": 54,
+      "wins": 25,
+      "winrate": 0.463
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "TOP"
+  },
+  "Heimerdinger": {
+    "TOP": {
+      "games": 115,
+      "wins": 56,
+      "winrate": 0.487
+    },
+    "MIDDLE": {
+      "games": 31,
+      "wins": 17,
+      "winrate": 0.5484
+    },
+    "UTILITY": {
+      "games": 7,
+      "wins": 1,
+      "winrate": 0.1429
+    },
+    "BOTTOM": {
+      "games": 36,
+      "wins": 18,
+      "winrate": 0.5
+    },
+    "JUNGLE": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "TOP"
+  },
+  "Morgana": {
+    "JUNGLE": {
+      "games": 24,
+      "wins": 10,
+      "winrate": 0.4167
+    },
+    "UTILITY": {
+      "games": 340,
+      "wins": 174,
+      "winrate": 0.5118
+    },
+    "MIDDLE": {
+      "games": 59,
+      "wins": 29,
+      "winrate": 0.4915
+    },
+    "TOP": {
+      "games": 5,
+      "wins": 3,
+      "winrate": 0.6
+    },
+    "BOTTOM": {
+      "games": 2,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "UTILITY"
+  },
+  "Nidalee": {
+    "UTILITY": {
+      "games": 30,
+      "wins": 16,
+      "winrate": 0.5333
+    },
+    "JUNGLE": {
+      "games": 240,
+      "wins": 124,
+      "winrate": 0.5167
+    },
+    "MIDDLE": {
+      "games": 3,
+      "wins": 1,
+      "winrate": 0.3333
+    },
+    "TOP": {
+      "games": 18,
+      "wins": 8,
+      "winrate": 0.4444
+    },
+    "_primary": "JUNGLE"
+  },
+  "Zoe": {
+    "MIDDLE": {
+      "games": 315,
+      "wins": 155,
+      "winrate": 0.4921
+    },
+    "UTILITY": {
+      "games": 77,
+      "wins": 39,
+      "winrate": 0.5065
+    },
+    "TOP": {
+      "games": 30,
+      "wins": 16,
+      "winrate": 0.5333
+    },
+    "JUNGLE": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "MIDDLE"
+  },
+  "Bard": {
+    "UTILITY": {
+      "games": 885,
+      "wins": 459,
+      "winrate": 0.5186
+    },
+    "JUNGLE": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "TOP": {
+      "games": 2,
+      "wins": 2,
+      "winrate": 1.0
+    },
+    "MIDDLE": {
+      "games": 3,
+      "wins": 1,
+      "winrate": 0.3333
+    },
+    "_primary": "UTILITY"
+  },
+  "Vladimir": {
+    "MIDDLE": {
+      "games": 414,
+      "wins": 211,
+      "winrate": 0.5097
+    },
+    "TOP": {
+      "games": 196,
+      "wins": 90,
+      "winrate": 0.4592
+    },
+    "BOTTOM": {
+      "games": 123,
+      "wins": 54,
+      "winrate": 0.439
+    },
+    "_primary": "MIDDLE"
+  },
+  "Yuumi": {
+    "UTILITY": {
+      "games": 335,
+      "wins": 141,
+      "winrate": 0.4209
+    },
+    "_primary": "UTILITY"
+  },
+  "Aurora": {
+    "MIDDLE": {
+      "games": 405,
+      "wins": 209,
+      "winrate": 0.516
+    },
+    "TOP": {
+      "games": 175,
+      "wins": 94,
+      "winrate": 0.5371
+    },
+    "BOTTOM": {
+      "games": 4,
+      "wins": 1,
+      "winrate": 0.25
+    },
+    "_primary": "MIDDLE"
+  },
+  "Teemo": {
+    "TOP": {
+      "games": 458,
+      "wins": 243,
+      "winrate": 0.5306
+    },
+    "JUNGLE": {
+      "games": 99,
+      "wins": 51,
+      "winrate": 0.5152
+    },
+    "UTILITY": {
+      "games": 32,
+      "wins": 13,
+      "winrate": 0.4062
+    },
+    "MIDDLE": {
+      "games": 17,
+      "wins": 9,
+      "winrate": 0.5294
+    },
+    "BOTTOM": {
+      "games": 10,
+      "wins": 3,
+      "winrate": 0.3
+    },
+    "_primary": "TOP"
+  },
+  "Jayce": {
+    "TOP": {
+      "games": 422,
+      "wins": 225,
+      "winrate": 0.5332
+    },
+    "MIDDLE": {
+      "games": 116,
+      "wins": 49,
+      "winrate": 0.4224
+    },
+    "JUNGLE": {
+      "games": 171,
+      "wins": 92,
+      "winrate": 0.538
+    },
+    "BOTTOM": {
+      "games": 18,
+      "wins": 11,
+      "winrate": 0.6111
+    },
+    "UTILITY": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "_primary": "TOP"
+  },
+  "Hecarim": {
+    "JUNGLE": {
+      "games": 544,
+      "wins": 259,
+      "winrate": 0.4761
+    },
+    "MIDDLE": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "TOP": {
+      "games": 3,
+      "wins": 1,
+      "winrate": 0.3333
+    },
+    "_primary": "JUNGLE"
+  },
+  "Blitzcrank": {
+    "UTILITY": {
+      "games": 408,
+      "wins": 193,
+      "winrate": 0.473
+    },
+    "MIDDLE": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "UTILITY"
+  },
+  "Karthus": {
+    "JUNGLE": {
+      "games": 204,
+      "wins": 105,
+      "winrate": 0.5147
+    },
+    "BOTTOM": {
+      "games": 258,
+      "wins": 141,
+      "winrate": 0.5465
+    },
+    "TOP": {
+      "games": 23,
+      "wins": 11,
+      "winrate": 0.4783
+    },
+    "MIDDLE": {
+      "games": 30,
+      "wins": 19,
+      "winrate": 0.6333
+    },
+    "UTILITY": {
+      "games": 10,
+      "wins": 9,
+      "winrate": 0.9
+    },
+    "_primary": "BOTTOM"
+  },
+  "Yorick": {
+    "TOP": {
+      "games": 384,
+      "wins": 206,
+      "winrate": 0.5365
+    },
+    "JUNGLE": {
+      "games": 8,
+      "wins": 3,
+      "winrate": 0.375
+    },
+    "MIDDLE": {
+      "games": 12,
+      "wins": 6,
+      "winrate": 0.5
+    },
+    "BOTTOM": {
+      "games": 4,
+      "wins": 3,
+      "winrate": 0.75
+    },
+    "_primary": "TOP"
+  },
+  "Yone": {
+    "MIDDLE": {
+      "games": 514,
+      "wins": 254,
+      "winrate": 0.4942
+    },
+    "TOP": {
+      "games": 418,
+      "wins": 209,
+      "winrate": 0.5
+    },
+    "BOTTOM": {
+      "games": 13,
+      "wins": 6,
+      "winrate": 0.4615
+    },
+    "UTILITY": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "_primary": "MIDDLE"
+  },
+  "Aatrox": {
+    "JUNGLE": {
+      "games": 156,
+      "wins": 78,
+      "winrate": 0.5
+    },
+    "TOP": {
+      "games": 452,
+      "wins": 207,
+      "winrate": 0.458
+    },
+    "UTILITY": {
+      "games": 3,
+      "wins": 1,
+      "winrate": 0.3333
+    },
+    "MIDDLE": {
+      "games": 5,
+      "wins": 1,
+      "winrate": 0.2
+    },
+    "_primary": "TOP"
+  },
+  "Warwick": {
+    "JUNGLE": {
+      "games": 267,
+      "wins": 150,
+      "winrate": 0.5618
+    },
+    "TOP": {
+      "games": 137,
+      "wins": 64,
+      "winrate": 0.4672
+    },
+    "MIDDLE": {
+      "games": 4,
+      "wins": 2,
+      "winrate": 0.5
+    },
+    "UTILITY": {
+      "games": 2,
+      "wins": 2,
+      "winrate": 1.0
+    },
+    "_primary": "JUNGLE"
+  },
+  "Hwei": {
+    "MIDDLE": {
+      "games": 359,
+      "wins": 169,
+      "winrate": 0.4708
+    },
+    "UTILITY": {
+      "games": 30,
+      "wins": 18,
+      "winrate": 0.6
+    },
+    "BOTTOM": {
+      "games": 91,
+      "wins": 46,
+      "winrate": 0.5055
+    },
+    "TOP": {
+      "games": 5,
+      "wins": 2,
+      "winrate": 0.4
+    },
+    "_primary": "MIDDLE"
+  },
+  "Kaisa": {
+    "BOTTOM": {
+      "games": 1027,
+      "wins": 505,
+      "winrate": 0.4917
+    },
+    "MIDDLE": {
+      "games": 13,
+      "wins": 9,
+      "winrate": 0.6923
+    },
+    "JUNGLE": {
+      "games": 2,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "TOP": {
+      "games": 13,
+      "wins": 7,
+      "winrate": 0.5385
+    },
+    "_primary": "BOTTOM"
+  },
+  "Amumu": {
+    "JUNGLE": {
+      "games": 233,
+      "wins": 119,
+      "winrate": 0.5107
+    },
+    "UTILITY": {
+      "games": 28,
+      "wins": 17,
+      "winrate": 0.6071
+    },
+    "TOP": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "_primary": "JUNGLE"
+  },
+  "Ambessa": {
+    "TOP": {
+      "games": 362,
+      "wins": 177,
+      "winrate": 0.489
+    },
+    "JUNGLE": {
+      "games": 243,
+      "wins": 114,
+      "winrate": 0.4691
+    },
+    "MIDDLE": {
+      "games": 40,
+      "wins": 20,
+      "winrate": 0.5
+    },
+    "BOTTOM": {
+      "games": 2,
+      "wins": 2,
+      "winrate": 1.0
+    },
+    "_primary": "TOP"
+  },
+  "MasterYi": {
+    "JUNGLE": {
+      "games": 558,
+      "wins": 266,
+      "winrate": 0.4767
+    },
+    "TOP": {
+      "games": 68,
+      "wins": 27,
+      "winrate": 0.3971
+    },
+    "UTILITY": {
+      "games": 5,
+      "wins": 1,
+      "winrate": 0.2
+    },
+    "MIDDLE": {
+      "games": 11,
+      "wins": 6,
+      "winrate": 0.5455
+    },
+    "BOTTOM": {
+      "games": 3,
+      "wins": 2,
+      "winrate": 0.6667
+    },
+    "_primary": "JUNGLE"
+  },
+  "Irelia": {
+    "TOP": {
+      "games": 347,
+      "wins": 186,
+      "winrate": 0.536
+    },
+    "MIDDLE": {
+      "games": 228,
+      "wins": 113,
+      "winrate": 0.4956
+    },
+    "BOTTOM": {
+      "games": 6,
+      "wins": 5,
+      "winrate": 0.8333
+    },
+    "UTILITY": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "TOP"
+  },
+  "Quinn": {
+    "TOP": {
+      "games": 131,
+      "wins": 71,
+      "winrate": 0.542
+    },
+    "JUNGLE": {
+      "games": 67,
+      "wins": 30,
+      "winrate": 0.4478
+    },
+    "MIDDLE": {
+      "games": 70,
+      "wins": 39,
+      "winrate": 0.5571
+    },
+    "BOTTOM": {
+      "games": 4,
+      "wins": 2,
+      "winrate": 0.5
+    },
+    "UTILITY": {
+      "games": 8,
+      "wins": 4,
+      "winrate": 0.5
+    },
+    "_primary": "TOP"
+  },
+  "Ivern": {
+    "JUNGLE": {
+      "games": 242,
+      "wins": 129,
+      "winrate": 0.5331
+    },
+    "MIDDLE": {
+      "games": 5,
+      "wins": 3,
+      "winrate": 0.6
+    },
+    "UTILITY": {
+      "games": 16,
+      "wins": 5,
+      "winrate": 0.3125
+    },
+    "TOP": {
+      "games": 14,
+      "wins": 4,
+      "winrate": 0.2857
+    },
+    "_primary": "JUNGLE"
+  },
+  "Samira": {
+    "BOTTOM": {
+      "games": 473,
+      "wins": 238,
+      "winrate": 0.5032
+    },
+    "MIDDLE": {
+      "games": 2,
+      "wins": 2,
+      "winrate": 1.0
+    },
+    "TOP": {
+      "games": 3,
+      "wins": 1,
+      "winrate": 0.3333
+    },
+    "_primary": "BOTTOM"
+  },
+  "Thresh": {
+    "UTILITY": {
+      "games": 1036,
+      "wins": 534,
+      "winrate": 0.5154
+    },
+    "MIDDLE": {
+      "games": 2,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "TOP": {
+      "games": 2,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "UTILITY"
+  },
+  "Illaoi": {
+    "TOP": {
+      "games": 187,
+      "wins": 90,
+      "winrate": 0.4813
+    },
+    "MIDDLE": {
+      "games": 5,
+      "wins": 3,
+      "winrate": 0.6
+    },
+    "JUNGLE": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "_primary": "TOP"
+  },
+  "MissFortune": {
+    "BOTTOM": {
+      "games": 762,
+      "wins": 374,
+      "winrate": 0.4908
+    },
+    "UTILITY": {
+      "games": 16,
+      "wins": 8,
+      "winrate": 0.5
+    },
+    "MIDDLE": {
+      "games": 6,
+      "wins": 3,
+      "winrate": 0.5
+    },
+    "TOP": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "BOTTOM"
+  },
+  "Leona": {
+    "UTILITY": {
+      "games": 693,
+      "wins": 352,
+      "winrate": 0.5079
+    },
+    "JUNGLE": {
+      "games": 2,
+      "wins": 2,
+      "winrate": 1.0
+    },
+    "_primary": "UTILITY"
+  },
+  "Trundle": {
+    "TOP": {
+      "games": 147,
+      "wins": 73,
+      "winrate": 0.4966
+    },
+    "JUNGLE": {
+      "games": 70,
+      "wins": 37,
+      "winrate": 0.5286
+    },
+    "UTILITY": {
+      "games": 13,
+      "wins": 6,
+      "winrate": 0.4615
+    },
+    "MIDDLE": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "_primary": "TOP"
+  },
+  "Belveth": {
+    "JUNGLE": {
+      "games": 206,
+      "wins": 102,
+      "winrate": 0.4951
+    },
+    "TOP": {
+      "games": 7,
+      "wins": 7,
+      "winrate": 1.0
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "MIDDLE": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "JUNGLE"
+  },
+  "Rammus": {
+    "JUNGLE": {
+      "games": 128,
+      "wins": 66,
+      "winrate": 0.5156
+    },
+    "TOP": {
+      "games": 8,
+      "wins": 3,
+      "winrate": 0.375
+    },
+    "UTILITY": {
+      "games": 5,
+      "wins": 1,
+      "winrate": 0.2
+    },
+    "_primary": "JUNGLE"
+  },
+  "Draven": {
+    "BOTTOM": {
+      "games": 622,
+      "wins": 306,
+      "winrate": 0.492
+    },
+    "TOP": {
+      "games": 21,
+      "wins": 11,
+      "winrate": 0.5238
+    },
+    "MIDDLE": {
+      "games": 10,
+      "wins": 6,
+      "winrate": 0.6
+    },
+    "JUNGLE": {
+      "games": 2,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "BOTTOM"
+  },
+  "Riven": {
+    "TOP": {
+      "games": 324,
+      "wins": 154,
+      "winrate": 0.4753
+    },
+    "JUNGLE": {
+      "games": 29,
+      "wins": 13,
+      "winrate": 0.4483
+    },
+    "MIDDLE": {
+      "games": 168,
+      "wins": 87,
+      "winrate": 0.5179
+    },
+    "BOTTOM": {
+      "games": 9,
+      "wins": 4,
+      "winrate": 0.4444
+    },
+    "UTILITY": {
+      "games": 2,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "TOP"
+  },
+  "Shaco": {
+    "JUNGLE": {
+      "games": 530,
+      "wins": 265,
+      "winrate": 0.5
+    },
+    "TOP": {
+      "games": 9,
+      "wins": 3,
+      "winrate": 0.3333
+    },
+    "UTILITY": {
+      "games": 124,
+      "wins": 58,
+      "winrate": 0.4677
+    },
+    "_primary": "JUNGLE"
+  },
+  "LeeSin": {
+    "JUNGLE": {
+      "games": 756,
+      "wins": 390,
+      "winrate": 0.5159
+    },
+    "UTILITY": {
+      "games": 14,
+      "wins": 6,
+      "winrate": 0.4286
+    },
+    "TOP": {
+      "games": 51,
+      "wins": 31,
+      "winrate": 0.6078
+    },
+    "MIDDLE": {
+      "games": 16,
+      "wins": 7,
+      "winrate": 0.4375
+    },
+    "_primary": "JUNGLE"
+  },
+  "Nasus": {
+    "TOP": {
+      "games": 247,
+      "wins": 127,
+      "winrate": 0.5142
+    },
+    "JUNGLE": {
+      "games": 102,
+      "wins": 53,
+      "winrate": 0.5196
+    },
+    "UTILITY": {
+      "games": 4,
+      "wins": 2,
+      "winrate": 0.5
+    },
+    "MIDDLE": {
+      "games": 39,
+      "wins": 21,
+      "winrate": 0.5385
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "_primary": "TOP"
+  },
+  "Lissandra": {
+    "MIDDLE": {
+      "games": 381,
+      "wins": 182,
+      "winrate": 0.4777
+    },
+    "TOP": {
+      "games": 38,
+      "wins": 21,
+      "winrate": 0.5526
+    },
+    "UTILITY": {
+      "games": 11,
+      "wins": 7,
+      "winrate": 0.6364
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "MIDDLE"
+  },
+  "Sett": {
+    "TOP": {
+      "games": 395,
+      "wins": 202,
+      "winrate": 0.5114
+    },
+    "MIDDLE": {
+      "games": 14,
+      "wins": 7,
+      "winrate": 0.5
+    },
+    "UTILITY": {
+      "games": 12,
+      "wins": 7,
+      "winrate": 0.5833
+    },
+    "BOTTOM": {
+      "games": 7,
+      "wins": 3,
+      "winrate": 0.4286
+    },
+    "JUNGLE": {
+      "games": 3,
+      "wins": 2,
+      "winrate": 0.6667
+    },
+    "_primary": "TOP"
+  },
+  "Xerath": {
+    "MIDDLE": {
+      "games": 467,
+      "wins": 247,
+      "winrate": 0.5289
+    },
+    "UTILITY": {
+      "games": 157,
+      "wins": 83,
+      "winrate": 0.5287
+    },
+    "BOTTOM": {
+      "games": 66,
+      "wins": 31,
+      "winrate": 0.4697
+    },
+    "TOP": {
+      "games": 3,
+      "wins": 3,
+      "winrate": 1.0
+    },
+    "JUNGLE": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "MIDDLE"
+  },
+  "Zyra": {
+    "UTILITY": {
+      "games": 265,
+      "wins": 131,
+      "winrate": 0.4943
+    },
+    "MIDDLE": {
+      "games": 13,
+      "wins": 6,
+      "winrate": 0.4615
+    },
+    "JUNGLE": {
+      "games": 172,
+      "wins": 84,
+      "winrate": 0.4884
+    },
+    "BOTTOM": {
+      "games": 31,
+      "wins": 17,
+      "winrate": 0.5484
+    },
+    "TOP": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "_primary": "UTILITY"
+  },
+  "Ziggs": {
+    "MIDDLE": {
+      "games": 76,
+      "wins": 45,
+      "winrate": 0.5921
+    },
+    "UTILITY": {
+      "games": 7,
+      "wins": 1,
+      "winrate": 0.1429
+    },
+    "BOTTOM": {
+      "games": 185,
+      "wins": 84,
+      "winrate": 0.4541
+    },
+    "TOP": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "_primary": "BOTTOM"
+  },
+  "DrMundo": {
+    "TOP": {
+      "games": 403,
+      "wins": 194,
+      "winrate": 0.4814
+    },
+    "JUNGLE": {
+      "games": 209,
+      "wins": 107,
+      "winrate": 0.512
+    },
+    "MIDDLE": {
+      "games": 11,
+      "wins": 7,
+      "winrate": 0.6364
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "TOP"
+  },
+  "TwistedFate": {
+    "MIDDLE": {
+      "games": 387,
+      "wins": 185,
+      "winrate": 0.478
+    },
+    "BOTTOM": {
+      "games": 19,
+      "wins": 11,
+      "winrate": 0.5789
+    },
+    "UTILITY": {
+      "games": 18,
+      "wins": 6,
+      "winrate": 0.3333
+    },
+    "TOP": {
+      "games": 62,
+      "wins": 32,
+      "winrate": 0.5161
+    },
+    "JUNGLE": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "MIDDLE"
+  },
+  "Ryze": {
+    "TOP": {
+      "games": 70,
+      "wins": 34,
+      "winrate": 0.4857
+    },
+    "MIDDLE": {
+      "games": 400,
+      "wins": 210,
+      "winrate": 0.525
+    },
+    "UTILITY": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "BOTTOM": {
+      "games": 5,
+      "wins": 2,
+      "winrate": 0.4
+    },
+    "_primary": "MIDDLE"
+  },
+  "Singed": {
+    "TOP": {
+      "games": 280,
+      "wins": 141,
+      "winrate": 0.5036
+    },
+    "UTILITY": {
+      "games": 3,
+      "wins": 1,
+      "winrate": 0.3333
+    },
+    "MIDDLE": {
+      "games": 38,
+      "wins": 24,
+      "winrate": 0.6316
+    },
+    "JUNGLE": {
+      "games": 8,
+      "wins": 5,
+      "winrate": 0.625
+    },
+    "BOTTOM": {
+      "games": 4,
+      "wins": 3,
+      "winrate": 0.75
+    },
+    "_primary": "TOP"
+  },
+  "Kalista": {
+    "BOTTOM": {
+      "games": 262,
+      "wins": 119,
+      "winrate": 0.4542
+    },
+    "UTILITY": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "MIDDLE": {
+      "games": 17,
+      "wins": 5,
+      "winrate": 0.2941
+    },
+    "TOP": {
+      "games": 16,
+      "wins": 6,
+      "winrate": 0.375
+    },
+    "_primary": "BOTTOM"
+  },
+  "Akshan": {
+    "MIDDLE": {
+      "games": 420,
+      "wins": 219,
+      "winrate": 0.5214
+    },
+    "TOP": {
+      "games": 34,
+      "wins": 18,
+      "winrate": 0.5294
+    },
+    "BOTTOM": {
+      "games": 13,
+      "wins": 7,
+      "winrate": 0.5385
+    },
+    "_primary": "MIDDLE"
+  },
+  "Alistar": {
+    "UTILITY": {
+      "games": 439,
+      "wins": 211,
+      "winrate": 0.4806
+    },
+    "TOP": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "UTILITY"
+  },
+  "Taliyah": {
+    "JUNGLE": {
+      "games": 103,
+      "wins": 52,
+      "winrate": 0.5049
+    },
+    "MIDDLE": {
+      "games": 245,
+      "wins": 119,
+      "winrate": 0.4857
+    },
+    "BOTTOM": {
+      "games": 7,
+      "wins": 4,
+      "winrate": 0.5714
+    },
+    "UTILITY": {
+      "games": 5,
+      "wins": 3,
+      "winrate": 0.6
+    },
+    "TOP": {
+      "games": 8,
+      "wins": 3,
+      "winrate": 0.375
+    },
+    "_primary": "MIDDLE"
+  },
+  "Gangplank": {
+    "TOP": {
+      "games": 435,
+      "wins": 217,
+      "winrate": 0.4989
+    },
+    "MIDDLE": {
+      "games": 43,
+      "wins": 24,
+      "winrate": 0.5581
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "JUNGLE": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "_primary": "TOP"
+  },
+  "Gwen": {
+    "JUNGLE": {
+      "games": 98,
+      "wins": 52,
+      "winrate": 0.5306
+    },
+    "MIDDLE": {
+      "games": 41,
+      "wins": 18,
+      "winrate": 0.439
+    },
+    "TOP": {
+      "games": 264,
+      "wins": 133,
+      "winrate": 0.5038
+    },
+    "BOTTOM": {
+      "games": 3,
+      "wins": 1,
+      "winrate": 0.3333
+    },
+    "_primary": "TOP"
+  },
+  "Urgot": {
+    "TOP": {
+      "games": 266,
+      "wins": 114,
+      "winrate": 0.4286
+    },
+    "MIDDLE": {
+      "games": 4,
+      "wins": 4,
+      "winrate": 1.0
+    },
+    "JUNGLE": {
+      "games": 6,
+      "wins": 1,
+      "winrate": 0.1667
+    },
+    "_primary": "TOP"
+  },
+  "Chogath": {
+    "TOP": {
+      "games": 245,
+      "wins": 137,
+      "winrate": 0.5592
+    },
+    "MIDDLE": {
+      "games": 80,
+      "wins": 42,
+      "winrate": 0.525
+    },
+    "JUNGLE": {
+      "games": 81,
+      "wins": 46,
+      "winrate": 0.5679
+    },
+    "UTILITY": {
+      "games": 8,
+      "wins": 4,
+      "winrate": 0.5
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "_primary": "TOP"
+  },
+  "Pantheon": {
+    "TOP": {
+      "games": 191,
+      "wins": 89,
+      "winrate": 0.466
+    },
+    "JUNGLE": {
+      "games": 147,
+      "wins": 70,
+      "winrate": 0.4762
+    },
+    "UTILITY": {
+      "games": 299,
+      "wins": 149,
+      "winrate": 0.4983
+    },
+    "BOTTOM": {
+      "games": 4,
+      "wins": 1,
+      "winrate": 0.25
+    },
+    "MIDDLE": {
+      "games": 62,
+      "wins": 31,
+      "winrate": 0.5
+    },
+    "_primary": "UTILITY"
+  },
+  "Evelynn": {
+    "JUNGLE": {
+      "games": 272,
+      "wins": 138,
+      "winrate": 0.5074
+    },
+    "UTILITY": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "MIDDLE": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "JUNGLE"
+  },
+  "Xayah": {
+    "BOTTOM": {
+      "games": 293,
+      "wins": 156,
+      "winrate": 0.5324
+    },
+    "UTILITY": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "BOTTOM"
+  },
+  "Pyke": {
+    "UTILITY": {
+      "games": 591,
+      "wins": 292,
+      "winrate": 0.4941
+    },
+    "MIDDLE": {
+      "games": 4,
+      "wins": 1,
+      "winrate": 0.25
+    },
+    "BOTTOM": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "TOP": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "_primary": "UTILITY"
+  },
+  "Nilah": {
+    "BOTTOM": {
+      "games": 179,
+      "wins": 103,
+      "winrate": 0.5754
+    },
+    "MIDDLE": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "BOTTOM"
+  },
+  "Rell": {
+    "UTILITY": {
+      "games": 534,
+      "wins": 271,
+      "winrate": 0.5075
+    },
+    "TOP": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "_primary": "UTILITY"
+  },
+  "Kled": {
+    "TOP": {
+      "games": 134,
+      "wins": 67,
+      "winrate": 0.5
+    },
+    "MIDDLE": {
+      "games": 10,
+      "wins": 3,
+      "winrate": 0.3
+    },
+    "UTILITY": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "TOP"
+  },
+  "Skarner": {
+    "JUNGLE": {
+      "games": 183,
+      "wins": 87,
+      "winrate": 0.4754
+    },
+    "TOP": {
+      "games": 37,
+      "wins": 19,
+      "winrate": 0.5135
+    },
+    "MIDDLE": {
+      "games": 2,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "UTILITY": {
+      "games": 17,
+      "wins": 5,
+      "winrate": 0.2941
+    },
+    "_primary": "JUNGLE"
+  },
+  "Renata": {
+    "UTILITY": {
+      "games": 125,
+      "wins": 70,
+      "winrate": 0.56
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "UTILITY"
+  },
+  "Tryndamere": {
+    "TOP": {
+      "games": 300,
+      "wins": 156,
+      "winrate": 0.52
+    },
+    "MIDDLE": {
+      "games": 59,
+      "wins": 28,
+      "winrate": 0.4746
+    },
+    "JUNGLE": {
+      "games": 15,
+      "wins": 8,
+      "winrate": 0.5333
+    },
+    "UTILITY": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "BOTTOM": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "_primary": "TOP"
+  },
+  "Orianna": {
+    "MIDDLE": {
+      "games": 448,
+      "wins": 217,
+      "winrate": 0.4844
+    },
+    "UTILITY": {
+      "games": 8,
+      "wins": 5,
+      "winrate": 0.625
+    },
+    "BOTTOM": {
+      "games": 4,
+      "wins": 2,
+      "winrate": 0.5
+    },
+    "TOP": {
+      "games": 10,
+      "wins": 5,
+      "winrate": 0.5
+    },
+    "_primary": "MIDDLE"
+  },
+  "Velkoz": {
+    "UTILITY": {
+      "games": 339,
+      "wins": 170,
+      "winrate": 0.5015
+    },
+    "MIDDLE": {
+      "games": 189,
+      "wins": 93,
+      "winrate": 0.4921
+    },
+    "BOTTOM": {
+      "games": 108,
+      "wins": 54,
+      "winrate": 0.5
+    },
+    "TOP": {
+      "games": 14,
+      "wins": 9,
+      "winrate": 0.6429
+    },
+    "_primary": "UTILITY"
+  },
+  "Sion": {
+    "TOP": {
+      "games": 672,
+      "wins": 334,
+      "winrate": 0.497
+    },
+    "JUNGLE": {
+      "games": 13,
+      "wins": 5,
+      "winrate": 0.3846
+    },
+    "MIDDLE": {
+      "games": 97,
+      "wins": 47,
+      "winrate": 0.4845
+    },
+    "BOTTOM": {
+      "games": 9,
+      "wins": 5,
+      "winrate": 0.5556
+    },
+    "UTILITY": {
+      "games": 16,
+      "wins": 12,
+      "winrate": 0.75
+    },
+    "_primary": "TOP"
+  },
+  "Azir": {
+    "MIDDLE": {
+      "games": 151,
+      "wins": 69,
+      "winrate": 0.457
+    },
+    "TOP": {
+      "games": 18,
+      "wins": 8,
+      "winrate": 0.4444
+    },
+    "BOTTOM": {
+      "games": 6,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "MIDDLE"
+  },
+  "Cassiopeia": {
+    "MIDDLE": {
+      "games": 259,
+      "wins": 111,
+      "winrate": 0.4286
+    },
+    "TOP": {
+      "games": 232,
+      "wins": 120,
+      "winrate": 0.5172
+    },
+    "BOTTOM": {
+      "games": 77,
+      "wins": 34,
+      "winrate": 0.4416
+    },
+    "UTILITY": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "_primary": "MIDDLE"
+  },
+  "Kennen": {
+    "TOP": {
+      "games": 191,
+      "wins": 96,
+      "winrate": 0.5026
+    },
+    "MIDDLE": {
+      "games": 62,
+      "wins": 32,
+      "winrate": 0.5161
+    },
+    "UTILITY": {
+      "games": 4,
+      "wins": 1,
+      "winrate": 0.25
+    },
+    "BOTTOM": {
+      "games": 5,
+      "wins": 1,
+      "winrate": 0.2
+    },
+    "_primary": "TOP"
+  },
+  "Viktor": {
+    "MIDDLE": {
+      "games": 673,
+      "wins": 326,
+      "winrate": 0.4844
+    },
+    "BOTTOM": {
+      "games": 35,
+      "wins": 23,
+      "winrate": 0.6571
+    },
+    "UTILITY": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "TOP": {
+      "games": 21,
+      "wins": 8,
+      "winrate": 0.381
+    },
+    "_primary": "MIDDLE"
+  },
+  "Maokai": {
+    "JUNGLE": {
+      "games": 23,
+      "wins": 12,
+      "winrate": 0.5217
+    },
+    "TOP": {
+      "games": 66,
+      "wins": 34,
+      "winrate": 0.5152
+    },
+    "UTILITY": {
+      "games": 142,
+      "wins": 74,
+      "winrate": 0.5211
+    },
+    "_primary": "UTILITY"
+  },
+  "Rakan": {
+    "UTILITY": {
+      "games": 463,
+      "wins": 229,
+      "winrate": 0.4946
+    },
+    "MIDDLE": {
+      "games": 5,
+      "wins": 1,
+      "winrate": 0.2
+    },
+    "BOTTOM": {
+      "games": 1,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "_primary": "UTILITY"
+  },
+  "Olaf": {
+    "TOP": {
+      "games": 312,
+      "wins": 166,
+      "winrate": 0.5321
+    },
+    "MIDDLE": {
+      "games": 13,
+      "wins": 7,
+      "winrate": 0.5385
+    },
+    "JUNGLE": {
+      "games": 32,
+      "wins": 14,
+      "winrate": 0.4375
+    },
+    "UTILITY": {
+      "games": 2,
+      "wins": 1,
+      "winrate": 0.5
+    },
+    "BOTTOM": {
+      "games": 6,
+      "wins": 4,
+      "winrate": 0.6667
+    },
+    "_primary": "TOP"
+  },
+  "Zaahen": {
+    "TOP": {
+      "games": 297,
+      "wins": 133,
+      "winrate": 0.4478
+    },
+    "JUNGLE": {
+      "games": 128,
+      "wins": 66,
+      "winrate": 0.5156
+    },
+    "MIDDLE": {
+      "games": 3,
+      "wins": 3,
+      "winrate": 1.0
+    },
+    "UTILITY": {
+      "games": 1,
+      "wins": 1,
+      "winrate": 1.0
+    },
+    "_primary": "TOP"
+  },
+  "RekSai": {
+    "JUNGLE": {
+      "games": 307,
+      "wins": 165,
+      "winrate": 0.5375
+    },
+    "TOP": {
+      "games": 36,
+      "wins": 12,
+      "winrate": 0.3333
+    },
+    "UTILITY": {
+      "games": 5,
+      "wins": 0,
+      "winrate": 0.0
+    },
+    "MIDDLE": {
+      "games": 4,
+      "wins": 1,
+      "winrate": 0.25
+    },
+    "_primary": "JUNGLE"
+  }
+}

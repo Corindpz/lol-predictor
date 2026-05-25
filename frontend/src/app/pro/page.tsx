@@ -2,11 +2,11 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
-  ArrowLeft, Loader2, Search, Trophy, Zap, Shield, Leaf, Target, Heart, ChevronRight,
+  ArrowLeft, Loader2, Search, Trophy, Zap, Shield, Leaf, Target, Heart, ChevronRight, Swords,
 } from "lucide-react";
 import { champIcon, initDDragon } from "@/lib/ddragon";
 
-const API = "http://localhost:8000";
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 const ROLE_ICONS: Record<string, React.ReactNode> = {
   Top:     <Shield size={16} />,
@@ -22,6 +22,13 @@ const ROLE_COLORS: Record<string, string> = {
 
 interface BLGPlayer {
   name: string; role: string; game_name: string; tag: string; region: string;
+}
+
+interface TournamentMatch {
+  match_id: string; date: string; block: string; league: string;
+  team1: string; team2: string; team1_name: string; team2_name: string;
+  team1_img: string; team2_img: string; winner: string;
+  games: { id: string; number: number; state: string }[];
 }
 
 interface DatasetStats {
@@ -55,6 +62,14 @@ function ChampionTag({ name }: { name: string }) {
   );
 }
 
+const LEAGUES = [
+  { key: "lec", label: "LEC" },
+  { key: "lck", label: "LCK" },
+  { key: "lpl", label: "LPL" },
+  { key: "worlds", label: "Worlds" },
+  { key: "msi", label: "MSI" },
+];
+
 export default function ProPage() {
   const router = useRouter();
   const [roster, setRoster] = useState<BLGPlayer[]>([]);
@@ -67,12 +82,31 @@ export default function ProPage() {
   const [proGames, setProGames] = useState<any[]>([]);
   const [searchError, setSearchError] = useState("");
   const [selectedPlayer, setSelectedPlayer] = useState<BLGPlayer | null>(null);
+  // Tournois
+  const [selectedLeague, setSelectedLeague] = useState("lec");
+  const [tournamentMatches, setTournamentMatches] = useState<TournamentMatch[]>([]);
+  const [loadingSchedule, setLoadingSchedule] = useState(false);
 
   useEffect(() => {
     initDDragon();
     fetch(`${API}/pro/roster`).then(r => r.json()).then(d => setRoster(d.players)).catch(() => {});
     fetch(`${API}/pro/dataset-stats`).then(r => r.json()).then(d => setDatasetStats(d.master_euw)).catch(() => {});
   }, []);
+
+  const loadSchedule = useCallback(async (league: string) => {
+    setSelectedLeague(league);
+    setLoadingSchedule(true);
+    setTournamentMatches([]);
+    try {
+      const res = await fetch(`${API}/pro/schedule/${league}?count=8`);
+      const data = await res.json();
+      setTournamentMatches(data.matches ?? []);
+    } finally {
+      setLoadingSchedule(false);
+    }
+  }, []);
+
+  useEffect(() => { loadSchedule("lec"); }, [loadSchedule]);
 
   const searchPro = useCallback(async (player?: BLGPlayer) => {
     const name = player?.game_name ?? searchName;
@@ -127,6 +161,87 @@ export default function ProPage() {
           Comparez les métriques LPL avec les parties Master+ EUW de notre dataset.
         </p>
       </div>
+
+      {/* Tournois en direct */}
+      <section className="mb-10">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="h-px flex-1" style={{ background: "var(--border)" }} />
+          <span className="text-xs font-bold tracking-widest uppercase" style={{ color: "var(--gold-dim)" }}>
+            Parties de tournoi — analyse modèle
+          </span>
+          <div className="h-px flex-1" style={{ background: "var(--border)" }} />
+        </div>
+
+        {/* League selector */}
+        <div className="flex gap-2 mb-4 flex-wrap">
+          {LEAGUES.map(l => (
+            <button key={l.key} onClick={() => loadSchedule(l.key)}
+              className="px-4 py-2 rounded-lg text-sm font-semibold transition-all"
+              style={{
+                background: selectedLeague === l.key ? "var(--bg-hover)" : "var(--bg-card)",
+                color: selectedLeague === l.key ? "var(--gold)" : "var(--muted)",
+                border: `1px solid ${selectedLeague === l.key ? "var(--gold)" : "var(--border)"}`,
+              }}>
+              {l.label}
+            </button>
+          ))}
+        </div>
+
+        {loadingSchedule && (
+          <div className="flex items-center gap-2 justify-center py-6" style={{ color: "var(--muted)" }}>
+            <Loader2 size={16} className="animate-spin" style={{ color: "var(--gold)" }} />
+            Chargement du calendrier...
+          </div>
+        )}
+
+        {tournamentMatches.length > 0 && (
+          <div className="space-y-2">
+            {tournamentMatches.map(m => {
+              const completedGames = m.games.filter(g => g.state === "completed");
+              const isWin1 = m.winner === m.team1;
+              return (
+                <div key={m.match_id} className="card-shine rounded-xl overflow-hidden">
+                  {/* Header du match */}
+                  <div className="flex items-center px-4 py-3 gap-4">
+                    <span className="text-xs shrink-0" style={{ color: "var(--muted)" }}>{m.date}</span>
+                    <span className="text-xs shrink-0 px-2 py-0.5 rounded" style={{ background: "var(--bg)", color: "var(--gold-dim)" }}>{m.block}</span>
+                    <div className="flex-1 flex items-center justify-center gap-4">
+                      <span className="font-black text-base" style={{ color: isWin1 ? "var(--gold)" : "var(--muted)" }}>
+                        {m.team1}
+                      </span>
+                      <span className="text-xs" style={{ color: "var(--muted)" }}>vs</span>
+                      <span className="font-black text-base" style={{ color: !isWin1 ? "var(--gold)" : "var(--muted)" }}>
+                        {m.team2}
+                      </span>
+                    </div>
+                    <span className="text-xs shrink-0" style={{ color: "var(--muted)" }}>{completedGames.length} game{completedGames.length > 1 ? "s" : ""}</span>
+                  </div>
+                  {/* Games analysables */}
+                  {completedGames.length > 0 && (
+                    <div className="flex gap-2 px-4 pb-3 flex-wrap">
+                      {completedGames.map(g => (
+                        <button key={g.id}
+                          onClick={() => router.push(`/esports-game/${g.id}?match=${m.match_id}&t1=${m.team1}&t2=${m.team2}`)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all hover:scale-105"
+                          style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--gold)" }}>
+                          <Swords size={11} />
+                          Game {g.number}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {!loadingSchedule && tournamentMatches.length === 0 && (
+          <div className="card-shine rounded-xl p-6 text-center text-sm" style={{ color: "var(--muted)" }}>
+            Aucun match disponible pour cette compétition.
+          </div>
+        )}
+      </section>
 
       {/* BLG Roster */}
       <section className="mb-10">

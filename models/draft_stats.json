@@ -1,0 +1,90 @@
+{
+  "auc_cv": 0.5131,
+  "acc_cv": 0.5156,
+  "auc_train": 0.6267,
+  "n_samples": 10097,
+  "n_features": 344,
+  "n_champions": 172,
+  "top_features": [
+    {
+      "feature": "blue_Sett",
+      "importance": 0.00879
+    },
+    {
+      "feature": "red_MissFortune",
+      "importance": 0.0087
+    },
+    {
+      "feature": "blue_Zeri",
+      "importance": 0.00794
+    },
+    {
+      "feature": "red_Zilean",
+      "importance": 0.00785
+    },
+    {
+      "feature": "blue_Vex",
+      "importance": 0.00765
+    },
+    {
+      "feature": "blue_Xayah",
+      "importance": 0.00761
+    },
+    {
+      "feature": "red_Sett",
+      "importance": 0.00747
+    },
+    {
+      "feature": "red_LeeSin",
+      "importance": 0.00737
+    },
+    {
+      "feature": "blue_Ekko",
+      "importance": 0.00717
+    },
+    {
+      "feature": "red_Sona",
+      "importance": 0.00713
+    },
+    {
+      "feature": "blue_Annie",
+      "importance": 0.007
+    },
+    {
+      "feature": "red_Udyr",
+      "importance": 0.00689
+    },
+    {
+      "feature": "blue_Chogath",
+      "importance": 0.00679
+    },
+    {
+      "feature": "blue_Gragas",
+      "importance": 0.00664
+    },
+    {
+      "feature": "red_Shaco",
+      "importance": 0.00655
+    },
+    {
+      "feature": "red_Irelia",
+      "importance": 0.00646
+    },
+    {
+      "feature": "blue_KSante",
+      "importance": 0.00641
+    },
+    {
+      "feature": "blue_Aatrox",
+      "importance": 0.0064
+    },
+    {
+      "feature": "blue_Riven",
+      "importance": 0.00636
+    },
+    {
+      "feature": "red_Volibear",
+      "importance": 0.00634
+    }
+  ]
+}

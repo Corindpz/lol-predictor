@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, TrendingUp, Swords, Users, Database, Brain, Trophy } from "lucide-react";
+import { Search, TrendingUp, Swords, Users, Database, Brain, Trophy, Puzzle, FlaskConical } from "lucide-react";
 
 export default function Home() {
   const router = useRouter();
@@ -71,6 +71,8 @@ export default function Home() {
             { icon: <Swords size={14} />, label: "Simulateur de partie" },
             { icon: <Users size={14} />, label: "Qui est le fautif ?" },
             { icon: <Trophy size={14} />, label: "Analyse pro LPL" },
+            { icon: <FlaskConical size={14} />, label: "Draft Tester" },
+            { icon: <Puzzle size={14} />, label: "Mini-jeu Synergie" },
           ].map(f => (
             <span key={f.label}
               className="flex items-center gap-2 px-4 py-2 rounded-full text-sm"
@@ -81,7 +83,7 @@ export default function Home() {
         </div>
 
         {/* Nav links */}
-        <div className="flex items-center gap-8">
+        <div className="flex flex-wrap items-center justify-center gap-6">
           <button onClick={() => router.push("/simulator")}
             className="text-sm opacity-50 hover:opacity-100 transition-opacity font-semibold"
             style={{ color: "var(--gold)" }}>
@@ -92,6 +94,18 @@ export default function Home() {
             className="text-sm opacity-50 hover:opacity-100 transition-opacity font-semibold"
             style={{ color: "var(--gold)" }}>
             Et en pro ? →
+          </button>
+          <span style={{ color: "var(--border)" }}>|</span>
+          <button onClick={() => router.push("/draft")}
+            className="text-sm opacity-50 hover:opacity-100 transition-opacity font-semibold"
+            style={{ color: "var(--gold)" }}>
+            Draft Tester →
+          </button>
+          <span style={{ color: "var(--border)" }}>|</span>
+          <button onClick={() => router.push("/synergy")}
+            className="text-sm opacity-50 hover:opacity-100 transition-opacity font-semibold"
+            style={{ color: "var(--gold)" }}>
+            Mini-jeu →
           </button>
         </div>
 

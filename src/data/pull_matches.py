@@ -51,12 +51,24 @@ TIER_ENDPOINTS = {
     "challenger":  f"https://{REGION}.api.riotgames.com/lol/league/v4/challengerleagues/by-queue/RANKED_SOLO_5x5",
 }
 
+def _tier_url(tier: str, div: str) -> str:
+    return f"https://{REGION}.api.riotgames.com/lol/league/v4/entries/RANKED_SOLO_5x5/{tier.upper()}/{div}"
+
 TIER_PAGES = {
-    # tier, division → endpoint paginé
-    ("diamond", "I"):   f"https://{REGION}.api.riotgames.com/lol/league/v4/entries/RANKED_SOLO_5x5/DIAMOND/I",
-    ("diamond", "II"):  f"https://{REGION}.api.riotgames.com/lol/league/v4/entries/RANKED_SOLO_5x5/DIAMOND/II",
-    ("platinum", "I"):  f"https://{REGION}.api.riotgames.com/lol/league/v4/entries/RANKED_SOLO_5x5/PLATINUM/I",
-    ("gold", "I"):      f"https://{REGION}.api.riotgames.com/lol/league/v4/entries/RANKED_SOLO_5x5/GOLD/I",
+    ("diamond",  "I"):   _tier_url("diamond",  "I"),
+    ("diamond",  "II"):  _tier_url("diamond",  "II"),
+    ("diamond",  "III"): _tier_url("diamond",  "III"),
+    ("diamond",  "IV"):  _tier_url("diamond",  "IV"),
+    ("platinum", "I"):   _tier_url("platinum", "I"),
+    ("platinum", "II"):  _tier_url("platinum", "II"),
+    ("platinum", "III"): _tier_url("platinum", "III"),
+    ("platinum", "IV"):  _tier_url("platinum", "IV"),
+    ("gold",     "I"):   _tier_url("gold",     "I"),
+    ("gold",     "II"):  _tier_url("gold",     "II"),
+    ("gold",     "III"): _tier_url("gold",     "III"),
+    ("gold",     "IV"):  _tier_url("gold",     "IV"),
+    ("silver",   "I"):   _tier_url("silver",   "I"),
+    ("silver",   "II"):  _tier_url("silver",   "II"),
 }
 
 
@@ -125,30 +137,39 @@ def fetch_match_info(match_id: str) -> dict | None:
     return data
 
 
-TIERS_CONFIG = [
-    # (fetch_fn_args, proportion)  — on répartit les matchs sur plusieurs elos
-    ("apex", "master",      0.35),
-    ("apex", "grandmaster", 0.10),
-    ("apex", "challenger",  0.05),
-    ("tier", ("diamond", "I"),   0.20),
-    ("tier", ("diamond", "II"),  0.15),
-    ("tier", ("platinum", "I"),  0.10),
-    ("tier", ("gold", "I"),      0.05),
+ALL_TIERS = [
+    ("apex", "master"),
+    ("apex", "grandmaster"),
+    ("apex", "challenger"),
+    ("tier", ("diamond",  "I")),
+    ("tier", ("diamond",  "II")),
+    ("tier", ("diamond",  "III")),
+    ("tier", ("diamond",  "IV")),
+    ("tier", ("platinum", "I")),
+    ("tier", ("platinum", "II")),
+    ("tier", ("platinum", "III")),
+    ("tier", ("platinum", "IV")),
+    ("tier", ("gold",     "I")),
+    ("tier", ("gold",     "II")),
+    ("tier", ("gold",     "III")),
+    ("tier", ("gold",     "IV")),
+    ("tier", ("silver",   "I")),
+    ("tier", ("silver",   "II")),
 ]
 
 
 def _collect_puuids_all() -> list[str]:
     """Collecte les PUUIDs de tous les tiers configurés."""
     all_puuids = []
-    for kind, arg, _ in TIERS_CONFIG:
+    for kind, arg in ALL_TIERS:
         try:
             if kind == "apex":
                 all_puuids.extend(fetch_puuids_apex(arg))
             else:
-                all_puuids.extend(fetch_puuids_tier(*arg))
+                all_puuids.extend(fetch_puuids_tier(*arg, max_pages=15))
         except Exception as e:
             print(f"  [skip] {arg} : {e}")
-        time.sleep(0.5)
+        time.sleep(0.3)
     return all_puuids
 
 

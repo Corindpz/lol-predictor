@@ -26,6 +26,18 @@ FEATURE_COLS = [
     "current_gold_diff",
     "dragon_soul",
     "cc_diff",
+    # v4 features
+    "void_grubs_diff",
+    "first_tower",
+    "infernal_diff",
+    "ocean_diff",
+    "elder_active",
+    "powerspike_diff",
+    # v5 features
+    "mountain_diff",
+    "cloud_diff",
+    "chemtech_diff",
+    "hextech_diff",
 ]
 
 TARGET_COL = "blue_wins"

@@ -11,7 +11,7 @@ import {
   CartesianGrid, Tooltip, ReferenceLine,
 } from "recharts";
 
-const API = "http://localhost:8000";
+const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 interface CurvePoint { minute: number; player_win_prob: number; gold_diff: number; kills_diff: number; }
 interface BlamePlayer {
@@ -183,7 +183,14 @@ export default function GamePage({ params }: { params: Promise<{ matchId: string
 
   useEffect(() => {
     initDDragon();
-    fetch(`${API}/game/${matchId}?player_team=${playerTeam}`)
+    // Auto-detect region from match ID prefix (KR_ → asia, EUW1_ → europe)
+    const region = matchId.startsWith("KR_") ? "kr"
+      : matchId.startsWith("NA1_") ? "na"
+      : "euw";
+    const endpoint = region === "euw"
+      ? `${API}/game/${matchId}?player_team=${playerTeam}`
+      : `${API}/pro/game/${matchId}?player_team=${playerTeam}&region=${region}`;
+    fetch(endpoint)
       .then(r => r.json())
       .then(setData)
       .finally(() => setLoading(false));
