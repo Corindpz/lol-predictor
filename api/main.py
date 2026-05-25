@@ -132,6 +132,12 @@ def predict(features: FeatureInput):
     }
 
 
+@app.get("/health")
+def health():
+    from src.data.fetch_player import API_KEY
+    return {"status": "ok", "riot_key_loaded": bool(API_KEY), "key_prefix": (API_KEY or "")[:12]}
+
+
 @app.get("/player/{riot_id}")
 def get_player(riot_id: str):
     """riot_id = 'GameName-TAG' (tiret comme séparateur dans l'URL)"""
