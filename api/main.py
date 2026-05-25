@@ -134,8 +134,8 @@ def predict(features: FeatureInput):
 
 @app.get("/health")
 def health():
-    from src.data.fetch_player import API_KEY
-    return {"status": "ok", "riot_key_loaded": bool(API_KEY), "key_prefix": (API_KEY or "")[:12]}
+    key = os.getenv("RIOT_API_KEY", "")
+    return {"status": "ok", "riot_key_loaded": bool(key), "key_prefix": key[:12] if key else "MISSING"}
 
 
 @app.get("/player/{riot_id}")
