@@ -30,12 +30,12 @@ import pandas as pd
 app = FastAPI(title="LoL Win Predictor API")
 
 import os
-_CORS_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:3003").split(",")
+_CORS_ORIGINS = os.getenv("CORS_ORIGINS", "*")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_CORS_ORIGINS,
-    allow_credentials=True,
+    allow_origins=[_CORS_ORIGINS] if _CORS_ORIGINS != "*" else ["*"],
+    allow_credentials=_CORS_ORIGINS != "*",
     allow_methods=["*"],
     allow_headers=["*"],
 )
