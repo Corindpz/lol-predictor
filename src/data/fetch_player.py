@@ -24,6 +24,29 @@ CACHE_DIR.mkdir(parents=True, exist_ok=True)
 BLUE_IDS = {1, 2, 3, 4, 5}
 RED_IDS  = {6, 7, 8, 9, 10}
 
+DRAGON_LABELS = {
+    "FIRE_DRAGON":     "Dragon Infernal",
+    "EARTH_DRAGON":    "Dragon Montagne",
+    "WATER_DRAGON":    "Dragon Océan",
+    "AIR_DRAGON":      "Dragon Nuage",
+    "HEXTECH_DRAGON":  "Dragon Hextech",
+    "CHEMTECH_DRAGON": "Dragon Chemtech",
+    "ELDER_DRAGON":    "Ancien Dragon",
+}
+
+TOWER_TYPES = {
+    "OUTER_TURRET": "Tour extérieure",
+    "INNER_TURRET": "Tour intérieure",
+    "BASE_TURRET":  "Tour de base",
+    "NEXUS_TURRET": "Tour du Nexus",
+}
+
+LANE_LABELS = {
+    "TOP_LANE": "Top",
+    "MID_LANE": "Mid",
+    "BOT_LANE": "Bot",
+}
+
 
 def _get(url: str, params: dict = None, retries: int = 3):
     for attempt in range(retries):
@@ -52,7 +75,6 @@ ROUTING = {
 
 
 def get_puuid(game_name: str, tag_line: str) -> str | None:
-    """Résout un Riot ID (GameName#TAG) en PUUID — région EUW par défaut."""
     url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{game_name}/{tag_line}"
     data = _get(url)
     return data["puuid"] if data else None
@@ -119,7 +141,6 @@ def get_match_timeline(match_id: str) -> dict | None:
 
 
 def get_player_team(info: dict, puuid: str) -> str:
-    """Retourne 'blue' ou 'red' selon l'équipe du joueur dans la partie."""
     for p in info.get("info", {}).get("participants", []):
         if p.get("puuid") == puuid:
             return "blue" if p.get("teamId") == 100 else "red"
@@ -127,11 +148,9 @@ def get_player_team(info: dict, puuid: str) -> str:
 
 
 def build_game_summary(info: dict, puuid: str) -> dict:
-    """Résumé d'une partie : champion, durée, résultat, timestamp."""
     for p in info.get("info", {}).get("participants", []):
         if p.get("puuid") != puuid:
             continue
-        won = p.get("win", False)
         return {
             "match_id": info["metadata"]["matchId"],
             "champion": p.get("championName", "?"),
@@ -139,7 +158,7 @@ def build_game_summary(info: dict, puuid: str) -> dict:
             "kills": p.get("kills", 0),
             "deaths": p.get("deaths", 0),
             "assists": p.get("assists", 0),
-            "won": won,
+            "won": p.get("win", False),
             "duration_min": round(info["info"].get("gameDuration", 0) / 60, 1),
             "game_creation": info["info"].get("gameCreation", 0),
             "player_team": get_player_team(info, puuid),
@@ -147,12 +166,42 @@ def build_game_summary(info: dict, puuid: str) -> dict:
     return {}
 
 
+def _detect_teamfights(kills: list[tuple]) -> list[dict]:
+    """Détecte les teamfights : clusters de 3+ kills en moins de 30 secondes."""
+    if len(kills) < 3:
+        return []
+
+    kills_sorted = sorted(kills, key=lambda x: x[0])
+    events = []
+    used: set[int] = set()
+
+    for i, (ts, team) in enumerate(kills_sorted):
+        if i in used:
+            continue
+        cluster_idx = [
+            j for j, (t2, _) in enumerate(kills_sorted)
+            if abs(t2 - ts) <= 30 and j not in used
+        ]
+        if len(cluster_idx) >= 3:
+            cluster = [kills_sorted[j] for j in cluster_idx]
+            blue_k = sum(1 for _, t in cluster if t == "blue")
+            red_k  = sum(1 for _, t in cluster if t == "red")
+            winner = "blue" if blue_k >= red_k else "red"
+            events.append({
+                "min": round(ts / 60, 1),
+                "label": f"Teamfight — {blue_k + red_k} kills",
+                "team": winner,
+                "type": "teamfight",
+            })
+            for j in cluster_idx:
+                used.add(j)
+
+    return events
+
+
 def extract_full_timeline(timeline: dict, info: dict) -> dict:
-    """
-    Extrait les features minute par minute + les events clés.
-    Retourne {"features_by_min": [...], "events": [...], "blue_won": bool}
-    """
     frames = timeline.get("info", {}).get("frames", [])
+
     blue_won = False
     for team in info.get("info", {}).get("teams", []):
         if team["teamId"] == 100:
@@ -160,6 +209,7 @@ def extract_full_timeline(timeline: dict, info: dict) -> dict:
 
     features_by_min = []
     key_events = []
+    all_kills: list[tuple] = []  # (timestamp_sec, team_str)
 
     kills_blue = kills_red = 0
     deaths_blue = deaths_red = 0
@@ -170,9 +220,10 @@ def extract_full_timeline(timeline: dict, info: dict) -> dict:
     barons_blue = barons_red = 0
     wards_blue = wards_red = 0
     plates_blue = plates_red = 0
-    kills_blue_window = []
+    kills_blue_window: list[float] = []
     first_blood = 0
     dragon_soul = 0
+    first_blood_done = False
 
     for frame_idx, frame in enumerate(frames):
         pf = frame.get("participantFrames", {})
@@ -182,7 +233,7 @@ def extract_full_timeline(timeline: dict, info: dict) -> dict:
 
         for pid_str, stats in pf.items():
             pid = int(pid_str)
-            cs   = stats.get("minionsKilled", 0) + stats.get("jungleMinionsKilled", 0)
+            cs  = stats.get("minionsKilled", 0) + stats.get("jungleMinionsKilled", 0)
             gold = stats.get("totalGold", 0)
             lv   = stats.get("level", 0)
             dmg  = stats.get("damageStats", {}).get("totalDamageDoneToChampions", 0)
@@ -200,69 +251,93 @@ def extract_full_timeline(timeline: dict, info: dict) -> dict:
 
         for event in frame.get("events", []):
             etype = event.get("type")
-            ts = event.get("timestamp", 0) / 1000
+            ts    = event.get("timestamp", 0) / 1000
+            min_  = round(ts / 60, 1)
             killer_team = event.get("killerTeamId", event.get("teamId", 0))
 
             if etype == "CHAMPION_KILL":
                 killer_id = event.get("killerId", 0)
-                victim_id  = event.get("victimId", 0)
+                victim_id = event.get("victimId", 0)
+
                 if killer_id in BLUE_IDS:
                     kills_blue += 1
                     kills_blue_window.append(ts)
-                    if first_blood == 0:
+                    all_kills.append((ts, "blue"))
+                    if not first_blood_done:
                         first_blood = 1
+                        first_blood_done = True
+                        key_events.append({"min": min_, "label": "First Blood", "team": "blue", "type": "first_blood"})
                 elif killer_id in RED_IDS:
                     kills_red += 1
-                    if first_blood == 0:
+                    all_kills.append((ts, "red"))
+                    if not first_blood_done:
                         first_blood = -1
+                        first_blood_done = True
+                        key_events.append({"min": min_, "label": "First Blood", "team": "red", "type": "first_blood"})
+
                 if victim_id in BLUE_IDS:
                     deaths_blue += 1
                 elif victim_id in RED_IDS:
                     deaths_red += 1
 
-                if frame_idx <= 2:
-                    key_events.append({"min": round(ts/60,1), "label": "⚔️ First Blood", "team": "blue" if killer_id in BLUE_IDS else "red"})
-
             elif etype == "BUILDING_KILL":
                 btype = event.get("buildingType", "")
+                lane  = LANE_LABELS.get(event.get("laneType", ""), "")
+
                 if btype == "INHIBITOR_BUILDING":
                     if killer_team == 100:
                         inhibitors_blue += 1
-                        key_events.append({"min": round(ts/60,1), "label": "🔴 Inhibiteur détruit", "team": "blue"})
+                        key_events.append({"min": min_, "label": f"Inhibiteur {lane}", "team": "blue", "type": "inhibitor"})
                     else:
                         inhibitors_red += 1
-                        key_events.append({"min": round(ts/60,1), "label": "🔴 Inhibiteur détruit", "team": "red"})
+                        key_events.append({"min": min_, "label": f"Inhibiteur {lane}", "team": "red", "type": "inhibitor"})
                 else:
+                    tower_label = TOWER_TYPES.get(event.get("towerType", ""), "Tour")
+                    label = f"{tower_label} {lane}".strip()
                     if killer_team == 100:
                         towers_blue += 1
-                        key_events.append({"min": round(ts/60,1), "label": "🏰 Tour détruite", "team": "blue"})
+                        key_events.append({"min": min_, "label": label, "team": "blue", "type": "tower"})
                     else:
                         towers_red += 1
-                        key_events.append({"min": round(ts/60,1), "label": "🏰 Tour détruite", "team": "red"})
+                        key_events.append({"min": min_, "label": label, "team": "red", "type": "tower"})
 
             elif etype == "ELITE_MONSTER_KILL":
                 monster = event.get("monsterType", "")
+                subtype = event.get("monsterSubType", "")
+
                 if monster == "DRAGON":
+                    is_elder = subtype == "ELDER_DRAGON"
+                    dragon_name = DRAGON_LABELS.get(subtype, "Dragon")
+                    event_type = "elder_dragon" if is_elder else "dragon"
+
                     if killer_team == 100:
                         dragons_blue += 1
-                        label = "🐉 Dragon Soul!" if dragons_blue == 4 else "🐉 Dragon"
-                        key_events.append({"min": round(ts/60,1), "label": label, "team": "blue"})
+                        key_events.append({"min": min_, "label": dragon_name, "team": "blue", "type": event_type})
                     else:
                         dragons_red += 1
-                        label = "🐉 Dragon Soul!" if dragons_red == 4 else "🐉 Dragon"
-                        key_events.append({"min": round(ts/60,1), "label": label, "team": "red"})
+                        key_events.append({"min": min_, "label": dragon_name, "team": "red", "type": event_type})
+
                 elif monster == "BARON_NASHOR":
                     if killer_team == 100:
                         barons_blue += 1
-                        key_events.append({"min": round(ts/60,1), "label": "👑 Baron Nashor", "team": "blue"})
+                        key_events.append({"min": min_, "label": "Baron Nashor", "team": "blue", "type": "baron"})
                     else:
                         barons_red += 1
-                        key_events.append({"min": round(ts/60,1), "label": "👑 Baron Nashor", "team": "red"})
+                        key_events.append({"min": min_, "label": "Baron Nashor", "team": "red", "type": "baron"})
+
                 elif monster == "RIFTHERALD":
                     if killer_team == 100:
                         heralds_blue += 1
+                        key_events.append({"min": min_, "label": "Rift Herald", "team": "blue", "type": "rift_herald"})
                     else:
                         heralds_red += 1
+                        key_events.append({"min": min_, "label": "Rift Herald", "team": "red", "type": "rift_herald"})
+
+                elif monster == "HORDE":  # Void Grubs
+                    if killer_team == 100:
+                        key_events.append({"min": min_, "label": "Void Grub", "team": "blue", "type": "void_grub"})
+                    else:
+                        key_events.append({"min": min_, "label": "Void Grub", "team": "red", "type": "void_grub"})
 
             elif etype == "WARD_PLACED":
                 creator = event.get("creatorId", 0)
@@ -281,6 +356,8 @@ def extract_full_timeline(timeline: dict, info: dict) -> dict:
             elif etype == "DRAGON_SOUL_GIVEN":
                 soul_team = event.get("teamId", 0)
                 dragon_soul = 1 if soul_team == 100 else -1
+                team_str = "blue" if soul_team == 100 else "red"
+                key_events.append({"min": min_, "label": "Dragon Soul", "team": team_str, "type": "dragon_soul"})
 
         kills_blue_recent = sum(1 for t in kills_blue_window if t >= current_time_sec - 180)
 
@@ -307,6 +384,11 @@ def extract_full_timeline(timeline: dict, info: dict) -> dict:
             "dragon_soul": dragon_soul,
             "cc_diff": blue_cc - red_cc,
         })
+
+    # Teamfight detection — post-process sur tous les kills
+    teamfight_events = _detect_teamfights(all_kills)
+    key_events.extend(teamfight_events)
+    key_events.sort(key=lambda e: e["min"])
 
     return {
         "features_by_min": features_by_min,

@@ -266,11 +266,11 @@ def _compute_blame(timeline: dict, info: dict, blue_won: bool) -> list[dict]:
 # ─── Section Pro ─────────────────────────────────────────────────────────────
 
 BLG_ROSTER = [
-    {"name": "Bin",    "role": "Top",     "game_name": "BIN",    "tag": "BIN",  "region": "kr"},
-    {"name": "XUN",    "role": "Jungle",  "game_name": "XUN",    "tag": "BLG",  "region": "kr"},
-    {"name": "Knight", "role": "Mid",     "game_name": "Knight", "tag": "BLG",  "region": "kr"},
-    {"name": "Viper",  "role": "ADC",     "game_name": "Viper",  "tag": "T1",   "region": "kr"},
-    {"name": "ON",     "role": "Support", "game_name": "ON",     "tag": "BLG",  "region": "kr"},
+    {"name": "Bin",    "role": "Top",     "game_name": "BLG bin",   "tag": "TOP", "region": "kr"},
+    {"name": "XUN",    "role": "Jungle",  "game_name": "BLG Xun",   "tag": "VvV", "region": "kr"},
+    {"name": "Knight", "role": "Mid",     "game_name": "BLG knight","tag": "0000","region": "euw"},
+    {"name": "Viper",  "role": "ADC",     "game_name": "Viper",     "tag": "BLG", "region": "kr"},
+    {"name": "ON",     "role": "Support", "game_name": "ON",        "tag": "BLG", "region": "kr"},
 ]
 
 
