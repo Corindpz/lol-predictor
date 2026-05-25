@@ -191,7 +191,7 @@ def _compute_blame(timeline: dict, info: dict, blue_won: bool) -> list[dict]:
     stats = {pid: {
         "kills": 0, "deaths": 0, "assists": 0,
         "wards_placed": 0, "wards_killed": 0,
-        "name": participants.get(pid, {}).get("summonerName", f"P{pid}"),
+        "name": (lambda p: p.get("riotIdGameName") or p.get("summonerName") or f"P{pid}")(participants.get(pid, {})),
         "champion": participants.get(pid, {}).get("championName", "?"),
         "team": "blue" if pid <= 5 else "red",
         "won": participants.get(pid, {}).get("win", False),
@@ -266,11 +266,11 @@ def _compute_blame(timeline: dict, info: dict, blue_won: bool) -> list[dict]:
 # ─── Section Pro ─────────────────────────────────────────────────────────────
 
 BLG_ROSTER = [
-    {"name": "Bin",   "role": "Top",     "game_name": "BIN",   "tag": "BIN",  "region": "kr"},
-    {"name": "Xun",   "role": "Jungle",  "game_name": "Xun",   "tag": "BLG",  "region": "kr"},
-    {"name": "Yagao", "role": "Mid",     "game_name": "Yagao", "tag": "BLG",  "region": "kr"},
-    {"name": "Elk",   "role": "ADC",     "game_name": "Elk",   "tag": "BLG",  "region": "kr"},
-    {"name": "ON",    "role": "Support", "game_name": "ON",    "tag": "BLG",  "region": "kr"},
+    {"name": "Bin",    "role": "Top",     "game_name": "BIN",    "tag": "BIN",  "region": "kr"},
+    {"name": "XUN",    "role": "Jungle",  "game_name": "XUN",    "tag": "BLG",  "region": "kr"},
+    {"name": "Knight", "role": "Mid",     "game_name": "Knight", "tag": "BLG",  "region": "kr"},
+    {"name": "Viper",  "role": "ADC",     "game_name": "Viper",  "tag": "T1",   "region": "kr"},
+    {"name": "ON",     "role": "Support", "game_name": "ON",     "tag": "BLG",  "region": "kr"},
 ]
 
 

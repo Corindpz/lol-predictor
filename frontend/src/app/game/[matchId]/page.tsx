@@ -1,7 +1,8 @@
 "use client";
 import { use, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, Loader2, Trophy, Skull } from "lucide-react";
+import { ArrowLeft, Loader2, Trophy, Skull, TrendingUp, Swords, Users } from "lucide-react";
+import { champIcon, initDDragon } from "@/lib/ddragon";
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis,
   CartesianGrid, Tooltip, ReferenceLine,
@@ -19,6 +20,24 @@ interface GameData {
   match_id: string; blue_won: boolean; duration_min: number;
   curve: CurvePoint[]; key_events: Array<{min: number; label: string; team: string}>;
   blame: BlamePlayer[];
+}
+
+function ChampionAvatar({ name, size = 36 }: { name: string; size?: number }) {
+  const [err, setErr] = useState(false);
+  return (
+    <div className="rounded-lg overflow-hidden shrink-0"
+      style={{ width: size, height: size, border: "1px solid var(--border)" }}>
+      {!err ? (
+        <img src={champIcon(name)} alt={name} className="w-full h-full object-cover"
+          onError={() => setErr(true)} />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center text-xs font-bold"
+          style={{ background: "var(--bg-hover)", color: "var(--gold)" }}>
+          {name.slice(0, 2)}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function WinCurve({ curve, playerTeam, blueWon }: { curve: CurvePoint[]; playerTeam: string; blueWon: boolean }) {
@@ -62,57 +81,40 @@ function WinCurve({ curve, playerTeam, blueWon }: { curve: CurvePoint[]; playerT
   );
 }
 
-function BlameCard({ player, rank }: { player: BlamePlayer; rank: number }) {
-  const isWinner = player.won;
-  const accent = isWinner ? "var(--blue)" : "var(--red)";
-  const maxImpact = 100;
-  const barWidth = Math.min(Math.abs(player.impact_score) / maxImpact * 100, 100);
+function BlameRow({ player }: { player: BlamePlayer }) {
+  const maxImpact = 80;
+  const barW = Math.min(Math.abs(player.impact_score) / maxImpact * 100, 100);
+  const accent = player.impact_score > 0 ? "var(--blue)" : "var(--red)";
 
   return (
-    <div className="card-shine rounded-xl p-4 space-y-3">
-      <div className="flex items-center gap-3">
-        <span className="text-2xl font-black opacity-20">#{rank}</span>
-        <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-sm">{player.champion}</span>
-            <span className="text-xs px-2 py-0.5 rounded-full"
-              style={{ background: `${accent}15`, color: accent, border: `1px solid ${accent}33` }}>
-              {isWinner ? "Carry" : "Fautif"}
-            </span>
+    <div className="flex items-center gap-3 py-3"
+      style={{ borderBottom: "1px solid var(--border)" }}>
+      <ChampionAvatar name={player.champion} size={36} />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between mb-1">
+          <div className="min-w-0">
+            <span className="font-bold text-sm truncate block">{player.champion}</span>
+            <span className="text-xs truncate block" style={{ color: "var(--muted)" }}>{player.name}</span>
           </div>
-          <p className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>{player.name}</p>
+          <span className="font-mono text-xs shrink-0 ml-2" style={{ color: "var(--muted)" }}>
+            {player.kda_str}
+          </span>
         </div>
-        <div className="text-right">
-          <p className="font-bold text-sm">{player.kda_str}</p>
-          <p className="text-xs" style={{ color: "var(--muted)" }}>KDA</p>
-        </div>
-      </div>
-
-      {/* Impact bar */}
-      <div>
-        <div className="flex justify-between text-xs mb-1" style={{ color: "var(--muted)" }}>
-          <span>Impact score</span>
-          <span style={{ color: accent }}>{player.impact_score > 0 ? "+" : ""}{player.impact_score}</span>
-        </div>
-        <div className="h-1.5 rounded-full" style={{ background: "var(--bg)" }}>
-          <div className="h-full rounded-full transition-all"
-            style={{ width: `${barWidth}%`, background: accent }} />
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-2 text-center">
-        {[
-          { label: "Kill Part.", value: `${player.kill_participation}%` },
-          { label: "Wards", value: player.wards_placed },
-          { label: "CS", value: player.cs },
-        ].map(s => (
-          <div key={s.label} className="rounded-lg py-2 px-1"
-            style={{ background: "var(--bg)", border: "1px solid var(--border)" }}>
-            <p className="text-sm font-bold">{s.value}</p>
-            <p className="text-xs" style={{ color: "var(--muted)" }}>{s.label}</p>
+        <div className="flex items-center gap-2">
+          <div className="flex-1 h-1.5 rounded-full" style={{ background: "var(--bg)" }}>
+            <div className="h-full rounded-full transition-all"
+              style={{ width: `${barW}%`, background: accent }} />
           </div>
-        ))}
+          <span className="text-xs font-bold font-mono shrink-0 w-12 text-right"
+            style={{ color: accent }}>
+            {player.impact_score > 0 ? "+" : ""}{player.impact_score}
+          </span>
+        </div>
+        <div className="flex gap-3 mt-1">
+          <span className="text-xs" style={{ color: "var(--muted)" }}>KP {player.kill_participation}%</span>
+          <span className="text-xs" style={{ color: "var(--muted)" }}>CS {player.cs}</span>
+          <span className="text-xs" style={{ color: "var(--muted)" }}>{player.wards_placed}w</span>
+        </div>
       </div>
     </div>
   );
@@ -129,6 +131,7 @@ export default function GamePage({ params }: { params: Promise<{ matchId: string
   const [tab, setTab] = useState<"curve" | "blame">("curve");
 
   useEffect(() => {
+    initDDragon();
     fetch(`${API}/game/${matchId}?player_team=${playerTeam}`)
       .then(r => r.json())
       .then(setData)
@@ -142,20 +145,28 @@ export default function GamePage({ params }: { params: Promise<{ matchId: string
     </main>
   );
 
-  if (!data) return <main className="min-h-screen flex items-center justify-center" style={{ color: "var(--red)" }}>Partie introuvable.</main>;
+  if (!data) return (
+    <main className="min-h-screen flex items-center justify-center" style={{ color: "var(--red)" }}>
+      Partie introuvable.
+    </main>
+  );
 
   const playerWon = playerTeam === "blue" ? data.blue_won : !data.blue_won;
   const resultColor = playerWon ? "var(--blue)" : "var(--red)";
 
-  // Tipping point : première minute avec prob > 75 ou < 25
   const tipping = data.curve.find(p => p.player_win_prob > 75 || p.player_win_prob < 25);
 
-  // Blame séparé par équipe
-  const blueTeam = data.blame.filter(p => p.team === "blue").sort((a, b) => b.impact_score - a.impact_score);
-  const redTeam  = data.blame.filter(p => p.team === "red").sort((a, b) => b.impact_score - a.impact_score);
+  // Ton équipe = la team du joueur, Équipe adverse = l'autre
+  const myTeam  = data.blame.filter(p => p.team === playerTeam).sort((a, b) => b.impact_score - a.impact_score);
+  const oppTeam = data.blame.filter(p => p.team !== playerTeam).sort((a, b) => b.impact_score - a.impact_score);
+
+  const TABS = [
+    { id: "curve" as const, label: "Courbe win %", icon: <TrendingUp size={14} /> },
+    { id: "blame" as const, label: "Qui est fautif ?", icon: <Swords size={14} /> },
+  ];
 
   return (
-    <main className="min-h-screen px-4 py-10 max-w-2xl mx-auto">
+    <main className="min-h-screen px-4 py-10 max-w-5xl mx-auto">
       <button onClick={() => router.back()}
         className="flex items-center gap-2 text-sm mb-8 opacity-50 hover:opacity-100 transition-opacity"
         style={{ color: "var(--gold)" }}>
@@ -165,12 +176,14 @@ export default function GamePage({ params }: { params: Promise<{ matchId: string
       {/* Header */}
       <div className="mb-6 flex items-start justify-between">
         <div>
-          <p className="text-xs tracking-widest uppercase mb-1" style={{ color: "var(--gold-dim)" }}>Analyse post-game</p>
+          <p className="text-xs tracking-widest uppercase mb-1" style={{ color: "var(--gold-dim)" }}>
+            Analyse post-game
+          </p>
           <h1 className="text-3xl font-black" style={{ color: resultColor }}>
             {playerWon ? "Victoire" : "Défaite"}
           </h1>
           <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>
-            {data.duration_min} min · Équipe {playerTeam === "blue" ? "Bleue" : "Rouge"}
+            {data.duration_min} min
           </p>
         </div>
         {tipping && (
@@ -185,22 +198,22 @@ export default function GamePage({ params }: { params: Promise<{ matchId: string
 
       {/* Tabs */}
       <div className="flex gap-1 mb-6 p-1 rounded-xl" style={{ background: "var(--bg-card)" }}>
-        {(["curve", "blame"] as const).map(t => (
-          <button key={t} onClick={() => setTab(t)}
-            className="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all"
+        {TABS.map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)}
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all"
             style={{
-              background: tab === t ? "var(--bg-hover)" : "transparent",
-              color: tab === t ? "var(--text)" : "var(--muted)",
-              border: tab === t ? "1px solid var(--border)" : "1px solid transparent",
+              background: tab === t.id ? "var(--bg-hover)" : "transparent",
+              color: tab === t.id ? "var(--text)" : "var(--muted)",
+              border: tab === t.id ? "1px solid var(--border)" : "1px solid transparent",
             }}>
-            {t === "curve" ? "📈 Courbe win %" : "⚔️ Qui est le fautif ?"}
+            {t.icon}{t.label}
           </button>
         ))}
       </div>
 
       {/* Curve tab */}
       {tab === "curve" && (
-        <div className="space-y-4">
+        <div className="space-y-4 max-w-2xl mx-auto">
           <div className="card-shine rounded-xl p-5">
             <p className="text-sm font-semibold mb-4" style={{ color: "var(--muted)" }}>
               Probabilité de victoire — minute par minute
@@ -208,8 +221,9 @@ export default function GamePage({ params }: { params: Promise<{ matchId: string
             <WinCurve curve={data.curve} playerTeam={playerTeam} blueWon={data.blue_won} />
           </div>
 
-          {/* Key events */}
-          {data.key_events.length > 0 && (
+          {data.key_events.filter(e =>
+            e.label.includes("Baron") || e.label.includes("Soul") || e.label.includes("Blood")
+          ).length > 0 && (
             <div className="card-shine rounded-xl p-5">
               <p className="text-sm font-semibold mb-3" style={{ color: "var(--muted)" }}>Moments clés</p>
               <div className="space-y-2">
@@ -231,26 +245,38 @@ export default function GamePage({ params }: { params: Promise<{ matchId: string
         </div>
       )}
 
-      {/* Blame tab */}
+      {/* Blame tab — 2 colonnes */}
       {tab === "blame" && (
-        <div className="space-y-6">
-          {[
-            { label: "🔵 Équipe Bleue", players: blueTeam, won: data.blue_won },
-            { label: "🔴 Équipe Rouge", players: redTeam, won: !data.blue_won },
-          ].map(team => (
-            <div key={team.label}>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="font-bold text-sm">{team.label}</span>
-                {team.won
-                  ? <Trophy size={14} style={{ color: "var(--gold)" }} />
-                  : <Skull size={14} style={{ color: "var(--red)" }} />}
+        <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-4">
+            {/* Ton équipe */}
+            <div className="card-shine rounded-xl p-5">
+              <div className="flex items-center gap-2 mb-1 pb-3"
+                style={{ borderBottom: "1px solid var(--border)" }}>
+                <Users size={14} style={{ color: playerWon ? "var(--blue)" : "var(--red)" }} />
+                <span className="font-bold text-sm">Ton équipe</span>
+                {playerWon
+                  ? <Trophy size={13} className="ml-auto" style={{ color: "var(--gold)" }} />
+                  : <Skull size={13} className="ml-auto" style={{ color: "var(--red)" }} />}
               </div>
-              <div className="space-y-2">
-                {team.players.map((p, i) => <BlameCard key={p.pid} player={p} rank={i + 1} />)}
-              </div>
+              {myTeam.map(p => <BlameRow key={p.pid} player={p} />)}
             </div>
-          ))}
-          <p className="text-xs text-center pb-4" style={{ color: "var(--muted)" }}>
+
+            {/* Équipe adverse */}
+            <div className="card-shine rounded-xl p-5">
+              <div className="flex items-center gap-2 mb-1 pb-3"
+                style={{ borderBottom: "1px solid var(--border)" }}>
+                <Swords size={14} style={{ color: playerWon ? "var(--red)" : "var(--blue)" }} />
+                <span className="font-bold text-sm">Équipe adverse</span>
+                {!playerWon
+                  ? <Trophy size={13} className="ml-auto" style={{ color: "var(--gold)" }} />
+                  : <Skull size={13} className="ml-auto" style={{ color: "var(--red)" }} />}
+              </div>
+              {oppTeam.map(p => <BlameRow key={p.pid} player={p} />)}
+            </div>
+          </div>
+
+          <p className="text-xs text-center pb-2" style={{ color: "var(--muted)" }}>
             Score d&apos;impact = kill participation + vision − pénalité morts
           </p>
         </div>

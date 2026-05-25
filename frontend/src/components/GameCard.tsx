@@ -1,3 +1,8 @@
+"use client";
+import { useState } from "react";
+import { ChevronRight } from "lucide-react";
+import { champIcon } from "@/lib/ddragon";
+
 interface GameCardProps {
   game: {
     match_id: string;
@@ -13,21 +18,35 @@ interface GameCardProps {
 }
 
 export function GameCard({ game, onClick }: GameCardProps) {
+  const [imgError, setImgError] = useState(false);
   const kda = `${game.kills}/${game.deaths}/${game.assists}`;
-  const teamColor = game.player_team === "blue" ? "var(--blue)" : "var(--red)";
   const resultColor = game.won ? "var(--blue)" : "var(--red)";
   const resultLabel = game.won ? "Victoire" : "Défaite";
 
   return (
-    <button onClick={onClick} className="w-full text-left card-shine rounded-xl p-4 flex items-center gap-4 group transition-all">
+    <button
+      onClick={onClick}
+      className="w-full text-left card-shine rounded-xl p-4 flex items-center gap-4 group transition-all hover:scale-[1.01]"
+    >
       {/* Result bar */}
-      <div className="w-1 self-stretch rounded-full shrink-0 transition-all"
-        style={{ background: resultColor }} />
+      <div className="w-1 self-stretch rounded-full shrink-0" style={{ background: resultColor }} />
 
-      {/* Champion */}
-      <div className="w-10 h-10 rounded-lg flex items-center justify-center text-lg font-bold shrink-0"
-        style={{ background: "var(--bg-hover)", border: "1px solid var(--border)" }}>
-        {game.champion.slice(0, 2)}
+      {/* Champion icon */}
+      <div className="w-11 h-11 rounded-lg overflow-hidden shrink-0 relative"
+        style={{ border: `1px solid var(--border)` }}>
+        {!imgError ? (
+          <img
+            src={champIcon(game.champion)}
+            alt={game.champion}
+            className="w-full h-full object-cover"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-sm font-bold"
+            style={{ background: "var(--bg-hover)", color: "var(--gold)" }}>
+            {game.champion.slice(0, 2)}
+          </div>
+        )}
       </div>
 
       {/* Info */}
@@ -35,20 +54,16 @@ export function GameCard({ game, onClick }: GameCardProps) {
         <div className="flex items-center gap-2">
           <span className="font-bold text-sm" style={{ color: resultColor }}>{resultLabel}</span>
           <span className="text-xs" style={{ color: "var(--muted)" }}>·</span>
-          <span className="text-xs" style={{ color: "var(--muted)" }}>{game.champion}</span>
+          <span className="text-xs font-medium">{game.champion}</span>
         </div>
         <div className="flex items-center gap-3 mt-0.5">
-          <span className="text-sm font-semibold">{kda}</span>
+          <span className="text-sm font-semibold font-mono">{kda}</span>
           <span className="text-xs" style={{ color: "var(--muted)" }}>{game.duration_min} min</span>
-          <span className="text-xs px-2 py-0.5 rounded-full"
-            style={{ background: "var(--bg-hover)", color: teamColor, border: `1px solid ${teamColor}33` }}>
-            Éq. {game.player_team === "blue" ? "Bleue" : "Rouge"}
-          </span>
         </div>
       </div>
 
-      {/* Arrow */}
-      <span className="text-lg opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: "var(--gold)" }}>→</span>
+      <ChevronRight size={16} className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+        style={{ color: "var(--gold)" }} />
     </button>
   );
 }
