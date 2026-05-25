@@ -137,6 +137,11 @@ def health():
     key = os.getenv("RIOT_API_KEY", "")
     return {"status": "ok", "riot_key_loaded": bool(key), "key_prefix": key[:12] if key else "MISSING"}
 
+@app.get("/debug-env")
+def debug_env():
+    key = os.getenv("RIOT_API_KEY", "")
+    return {"riot_key_loaded": bool(key), "key_prefix": key[:12] if key else "MISSING", "region": os.getenv("REGION", "NOT_SET")}
+
 
 @app.get("/player/{riot_id}")
 def get_player(riot_id: str):
