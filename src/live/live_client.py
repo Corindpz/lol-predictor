@@ -106,26 +106,34 @@ def extract_features(state: dict) -> Optional[dict]:
     blue_obj = _count_objectives(events_raw, BLUE_TEAM)
     red_obj = _count_objectives(events_raw, RED_TEAM)
 
-    # Kills dans les 3 dernières minutes (momentum)
+    # Momentum : diff de kills bleu - rouge sur les 3 dernières minutes.
     recent_threshold = game_time_sec - 180
-    kills_recent = sum(
-        1 for e in events_raw
-        if e.get("EventName") == "ChampionKill"
-        and e.get("EventTime", 0) >= recent_threshold
-        and BLUE_TEAM in e.get("KillerName", "")
-    )
 
+    def recent_kills(team_tag: str) -> int:
+        return sum(
+            1 for e in events_raw
+            if e.get("EventName") == "ChampionKill"
+            and e.get("EventTime", 0) >= recent_threshold
+            and team_tag in e.get("KillerName", "")
+        )
+
+    kills_recent_diff = recent_kills(BLUE_TEAM) - recent_kills(RED_TEAM)
+
+    # Features v6 calculables depuis la Live Client API. Les features non
+    # disponibles en live (gold_slope, players_alive_diff, damage_diff, plates,
+    # inhibiteurs, buffs, void grubs...) sont mises à 0 par predict.py (reindex).
     return {
-        "kills_diff": blue["kills"] - red["kills"],
-        "deaths_diff": blue["deaths"] - red["deaths"],
-        "cs_diff": blue["cs"] - red["cs"],
         "gold_diff": blue["gold"] - red["gold"],
+        "current_gold_diff": 0,
         "level_diff": blue["level"] - red["level"],
+        "cs_diff": blue["cs"] - red["cs"],
+        "kills_diff": blue["kills"] - red["kills"],
+        "kills_last_3min": kills_recent_diff,
+        "players_alive_diff": 0,
         "towers_diff": blue_obj["towers"] - red_obj["towers"],
         "dragons_diff": blue_obj["dragons"] - red_obj["dragons"],
         "heralds_diff": blue_obj["heralds"] - red_obj["heralds"],
         "barons_diff": blue_obj["barons"] - red_obj["barons"],
-        "kills_last_3min": kills_recent,
         "game_time_minutes": game_time_min,
     }
 

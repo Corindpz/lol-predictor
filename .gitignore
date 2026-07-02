@@ -6,3 +6,4 @@ venv/
 data/raw/
 .ipynb_checkpoints/
 .DS_Store
+backup_v1/

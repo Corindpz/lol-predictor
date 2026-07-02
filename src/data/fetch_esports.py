@@ -255,23 +255,18 @@ def fetch_game_curve(esports_game_id: str, predict_fn) -> dict | None:
         return team.get("towers", 0) * 3 + team.get("inhibitors", 0) * 5 + team.get("barons", 0) * 2
     blue_won = score(blue_last) >= score(red_last)
 
-    # 4. Construire la courbe minute par minute
+    # 4. Construire la courbe minute par minute (lissée)
+    from src.models.predict import smooth_probabilities
+    snaps = [(gm, _frame_to_features_min(fr, gm)) for gm, fr in raw_snapshots if gm >= 3]
+    probs = smooth_probabilities([predict_fn(feat) for _, feat in snaps])
     curve = []
-    prev_frame = None
-    # game_start fictif = epoch (pour _frame_to_features on passe game_minute directement)
-    for game_min, frame in raw_snapshots:
-        if game_min < 3:
-            prev_frame = frame
-            continue
-        feat = _frame_to_features_min(frame, game_min)
-        p_blue = predict_fn(feat)
+    for (game_min, feat), p_blue in zip(snaps, probs):
         curve.append({
             "minute":        game_min,
             "blue_win_prob": round(p_blue * 100, 1),
             "gold_diff":     feat["gold_diff"],
             "kills_diff":    feat["kills_diff"],
         })
-        prev_frame = frame
 
     duration_min = raw_snapshots[-1][0] if raw_snapshots else 0
 

@@ -115,14 +115,14 @@ while True:
         st.subheader("État actuel")
         cols = st.columns(2)
         metrics = [
-            ("Kills", features["kills_diff"]),
-            ("Deaths", features["deaths_diff"]),
-            ("CS", features["cs_diff"]),
-            ("Gold", features["gold_diff"]),
-            ("Tours", features["towers_diff"]),
-            ("Dragons", features["dragons_diff"]),
-            ("Barons", features["barons_diff"]),
-            ("Hérauts", features["heralds_diff"]),
+            ("Kills", features.get("kills_diff", 0)),
+            ("CS", features.get("cs_diff", 0)),
+            ("Gold", features.get("gold_diff", 0)),
+            ("Niveaux", features.get("level_diff", 0)),
+            ("Tours", features.get("towers_diff", 0)),
+            ("Dragons", features.get("dragons_diff", 0)),
+            ("Barons", features.get("barons_diff", 0)),
+            ("Hérauts", features.get("heralds_diff", 0)),
         ]
         for i, (label, val) in enumerate(metrics):
             delta_color = "normal" if val != 0 else "off"

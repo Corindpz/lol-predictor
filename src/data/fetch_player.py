@@ -11,6 +11,10 @@ from pathlib import Path
 import requests
 from dotenv import load_dotenv
 
+from src.features.build_features import (
+    BARON_BUFF_SEC, ELDER_BUFF_SEC, SLOPE_WINDOW, is_dead,
+)
+
 load_dotenv()
 
 API_KEY = os.getenv("RIOT_API_KEY")
@@ -147,10 +151,31 @@ def get_player_team(info: dict, puuid: str) -> str:
     return "blue"
 
 
+QUEUE_LABELS = {
+    420: "Ranked Solo",
+    440: "Ranked Flex",
+    400: "Normale Draft",
+    430: "Normale Blind",
+    450: "ARAM",
+    490: "Quickplay",
+    700: "Clash",
+}
+
+
 def build_game_summary(info: dict, puuid: str) -> dict:
-    for p in info.get("info", {}).get("participants", []):
+    participants = info.get("info", {}).get("participants", [])
+    for p in participants:
         if p.get("puuid") != puuid:
             continue
+        duration_min = round(info["info"].get("gameDuration", 0) / 60, 1)
+        cs = p.get("totalMinionsKilled", 0) + p.get("neutralMinionsKilled", 0)
+        # Kill participation = (kills + assists) / kills de l'équipe
+        team_kills = sum(
+            q.get("kills", 0) for q in participants
+            if q.get("teamId") == p.get("teamId")
+        )
+        kp = round((p.get("kills", 0) + p.get("assists", 0)) / max(team_kills, 1) * 100)
+        queue_id = info["info"].get("queueId", 0)
         return {
             "match_id": info["metadata"]["matchId"],
             "champion": p.get("championName", "?"),
@@ -159,9 +184,16 @@ def build_game_summary(info: dict, puuid: str) -> dict:
             "deaths": p.get("deaths", 0),
             "assists": p.get("assists", 0),
             "won": p.get("win", False),
-            "duration_min": round(info["info"].get("gameDuration", 0) / 60, 1),
+            "duration_min": duration_min,
             "game_creation": info["info"].get("gameCreation", 0),
             "player_team": get_player_team(info, puuid),
+            "cs": cs,
+            "cs_per_min": round(cs / max(duration_min, 1), 1),
+            "gold": p.get("goldEarned", 0),
+            "damage": p.get("totalDamageDealtToChampions", 0),
+            "vision_score": p.get("visionScore", 0),
+            "kp": kp,
+            "queue": QUEUE_LABELS.get(queue_id, "Autre"),
         }
     return {}
 
@@ -212,39 +244,33 @@ def extract_full_timeline(timeline: dict, info: dict) -> dict:
     all_kills: list[tuple] = []  # (timestamp_sec, team_str)
 
     kills_blue = kills_red = 0
-    deaths_blue = deaths_red = 0
     towers_blue = towers_red = 0
     inhibitors_blue = inhibitors_red = 0
     dragons_blue = dragons_red = 0
     heralds_blue = heralds_red = 0
     barons_blue = barons_red = 0
-    wards_blue = wards_red = 0
     plates_blue = plates_red = 0
     kills_blue_window: list[float] = []
+    kills_red_window: list[float] = []
     first_blood = 0
-    dragon_soul = 0
     first_blood_done = False
-    # v4
+    soul_awarded = False
     void_grubs_blue = void_grubs_red = 0
-    infernal_blue = infernal_red = 0
-    ocean_blue = ocean_red = 0
     first_tower = 0
     first_tower_done = False
-    elder_kill_ts: float = -999999  # timestamp (sec) du dernier elder tué
+    elder_kill_ts: float = -1e9   # timestamp (sec) du dernier elder tué
     elder_active_team = 0
-    # v5
-    mountain_blue = mountain_red = 0
-    cloud_blue = cloud_red = 0
-    chemtech_blue = chemtech_red = 0
-    hextech_blue = hextech_red = 0
-    powerspike_blue = powerspike_red = 0
-    POWERSPIKE_IDS = {3157, 3089, 3078, 3031, 6672, 3071, 6655, 4646}
+    baron_kill_ts: float = -1e9
+    baron_active_team = 0
+    level_by_pid: dict[int, int] = {}
+    last_death_ts: dict[int, float] = {}
+    gold_diff_history: list[int] = []  # gold_diff bleu-rouge par frame (pour la pente)
 
     for frame_idx, frame in enumerate(frames):
         pf = frame.get("participantFrames", {})
 
-        blue_cs = blue_gold = blue_level = blue_damage = blue_xp = blue_cur_gold = blue_cc = 0
-        red_cs  = red_gold  = red_level  = red_damage  = red_xp  = red_cur_gold  = red_cc  = 0
+        blue_cs = blue_gold = blue_level = blue_damage = blue_cur_gold = 0
+        red_cs  = red_gold  = red_level  = red_damage  = red_cur_gold  = 0
 
         for pid_str, stats in pf.items():
             pid = int(pid_str)
@@ -252,15 +278,14 @@ def extract_full_timeline(timeline: dict, info: dict) -> dict:
             gold = stats.get("totalGold", 0)
             lv   = stats.get("level", 0)
             dmg  = stats.get("damageStats", {}).get("totalDamageDoneToChampions", 0)
-            xp   = stats.get("xp", 0)
             cg   = stats.get("currentGold", 0)
-            cc   = stats.get("timeEnemySpentControlled", 0)
+            level_by_pid[pid] = lv
             if pid in BLUE_IDS:
                 blue_cs += cs; blue_gold += gold; blue_level += lv; blue_damage += dmg
-                blue_xp += xp; blue_cur_gold += cg; blue_cc += cc
+                blue_cur_gold += cg
             else:
                 red_cs += cs; red_gold += gold; red_level += lv; red_damage += dmg
-                red_xp += xp; red_cur_gold += cg; red_cc += cc
+                red_cur_gold += cg
 
         current_time_sec = frame_idx * 60
 
@@ -284,16 +309,15 @@ def extract_full_timeline(timeline: dict, info: dict) -> dict:
                         key_events.append({"min": min_, "label": "First Blood", "team": "blue", "type": "first_blood"})
                 elif killer_id in RED_IDS:
                     kills_red += 1
+                    kills_red_window.append(ts)
                     all_kills.append((ts, "red"))
                     if not first_blood_done:
                         first_blood = -1
                         first_blood_done = True
                         key_events.append({"min": min_, "label": "First Blood", "team": "red", "type": "first_blood"})
 
-                if victim_id in BLUE_IDS:
-                    deaths_blue += 1
-                elif victim_id in RED_IDS:
-                    deaths_red += 1
+                if victim_id:
+                    last_death_ts[victim_id] = ts
 
             elif etype == "BUILDING_KILL":
                 btype = event.get("buildingType", "")
@@ -332,31 +356,24 @@ def extract_full_timeline(timeline: dict, info: dict) -> dict:
                     is_elder = subtype == "ELDER_DRAGON"
                     dragon_name = DRAGON_LABELS.get(subtype, "Dragon")
                     event_type = "elder_dragon" if is_elder else "dragon"
+                    team_str = "blue" if killer_team == 100 else "red"
 
                     if is_elder:
                         elder_kill_ts = ts
                         elder_active_team = killer_team
-
-                    if killer_team == 100:
-                        dragons_blue += 1
-                        if subtype == "FIRE_DRAGON":       infernal_blue += 1
-                        elif subtype == "WATER_DRAGON":    ocean_blue += 1
-                        elif subtype == "EARTH_DRAGON":    mountain_blue += 1
-                        elif subtype == "AIR_DRAGON":      cloud_blue += 1
-                        elif subtype == "CHEMTECH_DRAGON": chemtech_blue += 1
-                        elif subtype == "HEXTECH_DRAGON":  hextech_blue += 1
-                        key_events.append({"min": min_, "label": dragon_name, "team": "blue", "type": event_type})
                     else:
-                        dragons_red += 1
-                        if subtype == "FIRE_DRAGON":       infernal_red += 1
-                        elif subtype == "WATER_DRAGON":    ocean_red += 1
-                        elif subtype == "EARTH_DRAGON":    mountain_red += 1
-                        elif subtype == "AIR_DRAGON":      cloud_red += 1
-                        elif subtype == "CHEMTECH_DRAGON": chemtech_red += 1
-                        elif subtype == "HEXTECH_DRAGON":  hextech_red += 1
-                        key_events.append({"min": min_, "label": dragon_name, "team": "red", "type": event_type})
+                        if killer_team == 100:
+                            dragons_blue += 1
+                        else:
+                            dragons_red += 1
+                        if not soul_awarded and (dragons_blue == 4 or dragons_red == 4):
+                            soul_awarded = True
+                            key_events.append({"min": min_, "label": "Dragon Soul", "team": team_str, "type": "dragon_soul"})
+                    key_events.append({"min": min_, "label": dragon_name, "team": team_str, "type": event_type})
 
                 elif monster == "BARON_NASHOR":
+                    baron_kill_ts = ts
+                    baron_active_team = killer_team
                     if killer_team == 100:
                         barons_blue += 1
                         key_events.append({"min": min_, "label": "Baron Nashor", "team": "blue", "type": "baron"})
@@ -380,13 +397,6 @@ def extract_full_timeline(timeline: dict, info: dict) -> dict:
                         void_grubs_red += 1
                         key_events.append({"min": min_, "label": "Void Grub", "team": "red", "type": "void_grub"})
 
-            elif etype == "WARD_PLACED":
-                creator = event.get("creatorId", 0)
-                if creator in BLUE_IDS:
-                    wards_blue += 1
-                elif creator in RED_IDS:
-                    wards_red += 1
-
             elif etype == "TURRET_PLATE_DESTROYED":
                 plate_team = event.get("teamId", 0)
                 if plate_team == 100:
@@ -394,63 +404,54 @@ def extract_full_timeline(timeline: dict, info: dict) -> dict:
                 else:
                     plates_blue += 1
 
-            elif etype == "ITEM_PURCHASED":
-                pid = event.get("participantId", 0)
-                item_id = event.get("itemId", 0)
-                if item_id in POWERSPIKE_IDS:
-                    if pid in BLUE_IDS:
-                        powerspike_blue += 1
-                    elif pid in RED_IDS:
-                        powerspike_red += 1
-
-            elif etype == "DRAGON_SOUL_GIVEN":
-                soul_team = event.get("teamId", 0)
-                dragon_soul = 1 if soul_team == 100 else -1
-                team_str = "blue" if soul_team == 100 else "red"
-                key_events.append({"min": min_, "label": "Dragon Soul", "team": team_str, "type": "dragon_soul"})
-
         kills_blue_recent = sum(1 for t in kills_blue_window if t >= current_time_sec - 180)
+        kills_red_recent = sum(1 for t in kills_red_window if t >= current_time_sec - 180)
 
-        # Elder buff actif si tué dans les 3 dernières minutes (180 sec)
-        if elder_kill_ts > 0 and current_time_sec - elder_kill_ts <= 180:
+        gold_diff_now = blue_gold - red_gold
+        gold_diff_history.append(gold_diff_now)
+        prev = gold_diff_history[max(0, frame_idx - SLOPE_WINDOW)]
+        gold_slope = (gold_diff_now - prev) / max(1, min(frame_idx, SLOPE_WINDOW))
+
+        baron_active = 0
+        if current_time_sec - baron_kill_ts < BARON_BUFF_SEC:
+            baron_active = 1 if baron_active_team == 100 else -1
+        elder_active = 0
+        if current_time_sec - elder_kill_ts < ELDER_BUFF_SEC:
             elder_active = 1 if elder_active_team == 100 else -1
-        else:
-            elder_active = 0
+
+        blue_alive = sum(
+            1 for pid in BLUE_IDS
+            if not is_dead(current_time_sec, last_death_ts.get(pid), level_by_pid.get(pid, 1), frame_idx)
+        )
+        red_alive = sum(
+            1 for pid in RED_IDS
+            if not is_dead(current_time_sec, last_death_ts.get(pid), level_by_pid.get(pid, 1), frame_idx)
+        )
 
         features_by_min.append({
             "minute": frame_idx,
-            "kills_diff": kills_blue - kills_red,
-            "deaths_diff": deaths_blue - deaths_red,
-            "cs_diff": blue_cs - red_cs,
-            "gold_diff": blue_gold - red_gold,
+            "gold_diff": gold_diff_now,
+            "gold_slope": gold_slope,
+            "current_gold_diff": blue_cur_gold - red_cur_gold,
             "level_diff": blue_level - red_level,
+            "cs_diff": blue_cs - red_cs,
+            "kills_diff": kills_blue - kills_red,
+            "kills_last_3min": kills_blue_recent - kills_red_recent,
+            "damage_diff": blue_damage - red_damage,
+            "players_alive_diff": blue_alive - red_alive,
+            "first_blood": first_blood,
             "towers_diff": towers_blue - towers_red,
+            "plates_diff": plates_blue - plates_red,
+            "inhibitors_diff": inhibitors_blue - inhibitors_red,
+            "first_tower": first_tower,
             "dragons_diff": dragons_blue - dragons_red,
+            "dragon_soul": 1 if dragons_blue >= 4 else (-1 if dragons_red >= 4 else 0),
             "heralds_diff": heralds_blue - heralds_red,
             "barons_diff": barons_blue - barons_red,
-            "kills_last_3min": kills_blue_recent,
-            "game_time_minutes": frame_idx,
-            "wards_diff": wards_blue - wards_red,
-            "inhibitors_diff": inhibitors_blue - inhibitors_red,
-            "damage_diff": blue_damage - red_damage,
-            "first_blood": first_blood,
-            "xp_diff": blue_xp - red_xp,
-            "plates_diff": plates_blue - plates_red,
-            "current_gold_diff": blue_cur_gold - red_cur_gold,
-            "dragon_soul": dragon_soul,
-            "cc_diff": blue_cc - red_cc,
-            # v4
-            "void_grubs_diff": void_grubs_blue - void_grubs_red,
-            "first_tower": first_tower,
-            "infernal_diff": infernal_blue - infernal_red,
-            "ocean_diff": ocean_blue - ocean_red,
+            "baron_active": baron_active,
             "elder_active": elder_active,
-            "powerspike_diff": powerspike_blue - powerspike_red,
-            # v5
-            "mountain_diff": mountain_blue - mountain_red,
-            "cloud_diff": cloud_blue - cloud_red,
-            "chemtech_diff": chemtech_blue - chemtech_red,
-            "hextech_diff": hextech_blue - hextech_red,
+            "void_grubs_diff": void_grubs_blue - void_grubs_red,
+            "game_time_minutes": frame_idx,
         })
 
     # Teamfight detection — post-process sur tous les kills

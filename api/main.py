@@ -20,7 +20,7 @@ from src.data.fetch_player import (
     get_puuid_region,
     get_recent_matches_region,
 )
-from src.models.predict import predict_win_probability, get_advice
+from src.models.predict import predict_win_probability, get_advice, smooth_probabilities
 from src.features.build_features import FEATURE_COLS
 
 import joblib
@@ -52,6 +52,7 @@ def _load_model():
     if Path("models/scaler.pkl").exists():
         _scaler = joblib.load("models/scaler.pkl")
     base = _model.calibrated_classifiers_[0].estimator
+    base = getattr(base, "estimator", base)  # déballe le FrozenEstimator (calibration isotonic)
     _shap_explainer = shap.TreeExplainer(base)
 
 @app.on_event("startup")
@@ -60,40 +61,34 @@ def startup():
 
 
 class FeatureInput(BaseModel):
-    kills_diff: float = 0
-    deaths_diff: float = 0
-    cs_diff: float = 0
+    # Jeu de features v6 (22 features, cf. src/features/build_features.py)
+    # Économie
     gold_diff: float = 0
+    gold_slope: float = 0
+    current_gold_diff: float = 0
     level_diff: float = 0
+    cs_diff: float = 0
+    # Combat
+    kills_diff: float = 0
+    kills_last_3min: float = 0
+    damage_diff: float = 0
+    players_alive_diff: float = 0
+    first_blood: float = 0
+    # Structures
     towers_diff: float = 0
+    plates_diff: float = 0
+    inhibitors_diff: float = 0
+    first_tower: float = 0
+    # Objectifs épiques
     dragons_diff: float = 0
+    dragon_soul: float = 0
     heralds_diff: float = 0
     barons_diff: float = 0
-    kills_last_3min: float = 0
-    game_time_minutes: float = 20
-    # v2 features
-    wards_diff: float = 0
-    inhibitors_diff: float = 0
-    damage_diff: float = 0
-    first_blood: float = 0
-    # v3 features
-    xp_diff: float = 0
-    plates_diff: float = 0
-    current_gold_diff: float = 0
-    dragon_soul: float = 0
-    cc_diff: float = 0
-    # v4 features
-    void_grubs_diff: float = 0
-    first_tower: float = 0
-    infernal_diff: float = 0
-    ocean_diff: float = 0
+    baron_active: float = 0
     elder_active: float = 0
-    powerspike_diff: float = 0
-    # v5 features
-    mountain_diff: float = 0
-    cloud_diff: float = 0
-    chemtech_diff: float = 0
-    hextech_diff: float = 0
+    void_grubs_diff: float = 0
+    # Temps
+    game_time_minutes: float = 20
 
 
 @app.get("/health")
@@ -182,12 +177,11 @@ def get_game(match_id: str, player_team: str = "blue"):
     key_events = game_data["key_events"]
     blue_won = game_data["blue_won"]
 
-    # Courbe de probabilité minute par minute
+    # Courbe de probabilité minute par minute (lissée pour absorber le jitter)
+    snaps = [s for s in features_by_min if s["minute"] >= 3]
+    probs = smooth_probabilities([predict_win_probability(s) for s in snaps])
     curve = []
-    for snap in features_by_min:
-        if snap["minute"] < 3:
-            continue
-        p_blue = predict_win_probability(snap)
+    for snap, p_blue in zip(snaps, probs):
         p_player = p_blue if player_team == "blue" else 1 - p_blue
         curve.append({
             "minute": snap["minute"],
@@ -322,7 +316,7 @@ def get_dataset_stats():
             stats[minute] = {
                 "gold_per_player": round((snap["gold_diff"].abs().mean() / 2 + snap["gold_diff"].mean() / 2) / 5, 0),
                 "cs_per_player": round(snap["cs_diff"].abs().mean() / 10 + 50, 1),
-                "wards_total": round(snap["wards_diff"].abs().mean() / 2 + 15, 1),
+                "players_alive_avg": round(float(snap["players_alive_diff"].abs().mean()), 2),
                 "damage_per_player": round(snap["damage_diff"].abs().mean() / 10 + 8000, 0),
                 "kills_total": round(snap["kills_diff"].abs().mean() / 2 + 5, 1),
                 "n_games": total_games,
@@ -342,7 +336,7 @@ def get_dataset_stats():
             result_stats[minute] = {
                 "gold_per_player": round(base + avg_gold_diff / 10, 0),
                 "cs_per_player": round(60 + minute * 4.2, 1),  # typical CS curve
-                "wards_diff_avg": round(float(snap["wards_diff"].mean()), 2),
+                "players_alive_avg": round(float(snap["players_alive_diff"].mean()), 2),
                 "damage_diff_avg": round(float(snap["damage_diff"].mean()), 0),
                 "kills_diff_avg": round(float(snap["kills_diff"].mean()), 2),
                 "blue_winrate": round(float(snap["blue_wins"].mean()) * 100, 1),
@@ -393,11 +387,10 @@ def get_pro_game(match_id: str, player_team: str = "blue", region: str = "kr"):
     key_events = game_data["key_events"]
     blue_won = game_data["blue_won"]
 
+    snaps = [s for s in features_by_min if s["minute"] >= 3]
+    probs = smooth_probabilities([predict_win_probability(s) for s in snaps])
     curve = []
-    for snap in features_by_min:
-        if snap["minute"] < 3:
-            continue
-        p_blue = predict_win_probability(snap)
+    for snap, p_blue in zip(snaps, probs):
         p_player = p_blue if player_team == "blue" else 1 - p_blue
         curve.append({
             "minute": snap["minute"],

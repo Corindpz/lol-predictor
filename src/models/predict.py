@@ -1,5 +1,7 @@
 """Charge le modèle entraîné et retourne une probabilité de victoire."""
 
+import json
+import warnings
 from pathlib import Path
 
 import joblib
@@ -9,19 +11,29 @@ import pandas as pd
 from src.features.build_features import FEATURE_COLS
 
 _model = None
-_scaler = None
 
 
 def _load():
-    global _model, _scaler
+    global _model
     model_path = Path("models/xgboost_final.pkl")
-    scaler_path = Path("models/scaler.pkl")
+    meta_path = Path("models/model_meta.json")
 
     if not model_path.exists():
         raise FileNotFoundError("Modèle introuvable. Lance src/models/train.py d'abord.")
 
     _model = joblib.load(model_path)
-    _scaler = joblib.load(scaler_path) if scaler_path.exists() else None
+
+    # Verifie que le modele servi attend bien les memes features que le code.
+    if meta_path.exists():
+        meta = json.loads(meta_path.read_text())
+        trained_cols = meta.get("feature_cols", [])
+        if trained_cols and trained_cols != FEATURE_COLS:
+            warnings.warn(
+                "Desynchronisation features modele/code : le .pkl a ete entraine "
+                f"sur {len(trained_cols)} features, le code en attend {len(FEATURE_COLS)}. "
+                "Relance src/models/train.py.",
+                RuntimeWarning,
+            )
 
 
 def predict_win_probability(features: dict) -> float:
@@ -29,16 +41,32 @@ def predict_win_probability(features: dict) -> float:
     features : dict avec les clés de FEATURE_COLS
     Retourne la probabilité de victoire de l'équipe bleue (0.0 → 1.0)
     """
-    global _model, _scaler
+    global _model
     if _model is None:
         _load()
 
-    X = pd.DataFrame([features])[FEATURE_COLS]
+    # reindex : toute feature absente du dict est mise a 0 plutot que de lever
+    # une KeyError -> l'inference reste robuste aux chemins de service partiels.
+    X = pd.DataFrame([features]).reindex(columns=FEATURE_COLS, fill_value=0)
 
-    # XGBoost calibré n'a pas besoin du scaler — LogReg oui
-    # On laisse le modèle gérer (XGBoost ignore les features non-scaled)
+    # XGBoost calibré est invariant à l'échelle : pas de scaler en inférence.
     proba = _model.predict_proba(X)[0][1]
     return float(np.clip(proba, 0.01, 0.99))
+
+
+def smooth_probabilities(probs: list[float], alpha: float = 0.3) -> list[float]:
+    """Lissage exponentiel (EMA) de la courbe win%.
+
+    Chaque snapshot est predit independamment : sans lissage, le jitter
+    minute-a-minute du gold est amplifie en sauts de proba. L'EMA garde le
+    signal des vrais objectifs tout en absorbant le bruit. alpha bas = plus lisse.
+    """
+    if not probs:
+        return probs
+    out = [probs[0]]
+    for p in probs[1:]:
+        out.append(alpha * p + (1 - alpha) * out[-1])
+    return out
 
 
 def get_advice(features: dict, proba: float) -> list[str]:

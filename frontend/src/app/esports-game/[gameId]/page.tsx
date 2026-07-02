@@ -168,7 +168,7 @@ export default function EsportsGamePage({ params }: { params: Promise<{ gameId: 
   const pivot = data.curve.find(c => blueWon ? c.blue_win_prob > 65 : c.blue_win_prob < 35);
 
   return (
-    <main className="min-h-screen px-4 py-10 max-w-5xl mx-auto">
+    <main className="min-h-screen px-6 md:px-12 lg:px-20 py-12">
       <button onClick={() => router.back()}
         className="flex items-center gap-2 text-sm mb-8 opacity-50 hover:opacity-100 transition-opacity"
         style={{ color: "var(--gold)" }}>

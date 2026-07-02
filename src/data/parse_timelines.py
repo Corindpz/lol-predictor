@@ -11,7 +11,9 @@ from pathlib import Path
 import pandas as pd
 from tqdm import tqdm
 
-from src.features.build_features import FEATURE_COLS, SNAPSHOT_MINUTES, TARGET_COL
+from src.features.build_features import (
+    BARON_BUFF_SEC, ELDER_BUFF_SEC, SLOPE_WINDOW, SNAPSHOT_MINUTES, TARGET_COL, is_dead,
+)
 
 RAW_DIR = Path("data/raw")
 PROCESSED_DIR = Path("data/processed")
@@ -20,17 +22,19 @@ PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 BLUE_IDS = {1, 2, 3, 4, 5}
 RED_IDS = {6, 7, 8, 9, 10}
 
-# Items qui créent des powerspikes significatifs (item IDs 2024-2025)
-POWERSPIKE_ITEMS = {
-    3157,  # Zhonya's Hourglass
-    3089,  # Rabadon's Deathcap
-    3078,  # Trinity Force
-    3031,  # Infinity Edge
-    6672,  # Kraken Slayer
-    3071,  # Black Cleaver
-    6655,  # Luden's Tempest
-    4646,  # Stormsurge
-}
+
+def _team_gold_at(frames: list[dict], idx: int) -> tuple[int, int]:
+    """Or total (bleu, rouge) à la frame idx. (0, 0) si hors limites."""
+    if idx < 0 or idx >= len(frames):
+        return 0, 0
+    blue = red = 0
+    for pid_str, stats in frames[idx].get("participantFrames", {}).items():
+        gold = stats.get("totalGold", 0)
+        if int(pid_str) in BLUE_IDS:
+            blue += gold
+        else:
+            red += gold
+    return blue, red
 
 
 def _blue_wins(info: dict) -> bool | None:
@@ -40,6 +44,16 @@ def _blue_wins(info: dict) -> bool | None:
     return None
 
 
+def _match_meta(info: dict) -> dict:
+    block = info.get("info", {})
+    return {
+        "game_creation": block.get("gameCreation", 0),
+        "game_duration": block.get("gameDuration", 0),
+        "game_version": block.get("gameVersion", ""),
+        "queue_id": block.get("queueId", 0),
+    }
+
+
 def _extract_snapshot(frames: list[dict], target_min: int) -> dict | None:
     """État du jeu à target_min minutes à partir des frames de la timeline."""
     if target_min >= len(frames):
@@ -47,57 +61,48 @@ def _extract_snapshot(frames: list[dict], target_min: int) -> dict | None:
 
     frame = frames[target_min]
     pf = frame.get("participantFrames", {})
+    if not pf:
+        return None
 
-    blue = {"kills": 0, "deaths": 0, "cs": 0, "gold": 0, "level": 0, "damage": 0, "xp": 0, "current_gold": 0, "cc": 0}
-    red  = {"kills": 0, "deaths": 0, "cs": 0, "gold": 0, "level": 0, "damage": 0, "xp": 0, "current_gold": 0, "cc": 0}
+    # Référence temporelle alignée sur fetch_player (frame_idx * 60) pour une
+    # parité train/serve exacte sur les buffs et le calcul des joueurs vivants.
+    target_sec = target_min * 60
+
+    blue = {"cs": 0, "gold": 0, "level": 0, "damage": 0, "current_gold": 0, "kills": 0}
+    red  = {"cs": 0, "gold": 0, "level": 0, "damage": 0, "current_gold": 0, "kills": 0}
+    level_by_pid: dict[int, int] = {}
 
     for pid_str, stats in pf.items():
         pid = int(pid_str)
         bucket = blue if pid in BLUE_IDS else red
-        cs = stats.get("minionsKilled", 0) + stats.get("jungleMinionsKilled", 0)
-        bucket["cs"] += cs
+        bucket["cs"] += stats.get("minionsKilled", 0) + stats.get("jungleMinionsKilled", 0)
         bucket["gold"] += stats.get("totalGold", 0)
         bucket["level"] += stats.get("level", 0)
-        bucket["xp"] += stats.get("xp", 0)
         bucket["current_gold"] += stats.get("currentGold", 0)
-        bucket["cc"] += stats.get("timeEnemySpentControlled", 0)
         bucket["damage"] += stats.get("damageStats", {}).get("totalDamageDoneToChampions", 0)
-
-    if not pf:
-        return None
+        level_by_pid[pid] = stats.get("level", 1)
 
     towers_blue = towers_red = 0
     inhibitors_blue = inhibitors_red = 0
     dragons_blue = dragons_red = 0
     heralds_blue = heralds_red = 0
     barons_blue = barons_red = 0
-    wards_blue = wards_red = 0
     plates_blue = plates_red = 0
-    kills_blue_recent = 0
-
-    first_blood = 0        # +1 = blue, -1 = red
-    dragon_soul = 0        # +1 = blue soul, -1 = red soul
-
-    # v4 features
-    void_grubs_blue = void_grubs_red = 0
-    infernal_blue = infernal_red = 0
-    ocean_blue = ocean_red = 0
+    kills_blue_recent = kills_red_recent = 0
+    first_blood = 0            # +1 = blue, -1 = red
     first_tower = 0            # +1 blue first, -1 red first
     first_tower_done = False
-    elder_kill_frame = -999    # frame index of most recent elder kill
-    elder_active_team = 0      # 100 or 200
-    powerspike_blue = powerspike_red = 0
-    # v5 features
-    mountain_blue = mountain_red = 0
-    cloud_blue = cloud_red = 0
-    chemtech_blue = chemtech_red = 0
-    hextech_blue = hextech_red = 0
+    void_grubs_blue = void_grubs_red = 0
+    last_death_ts: dict[int, float] = {}
+    last_baron_ts = last_elder_ts = -1e9
+    last_baron_team = last_elder_team = 0
 
     for f_idx, f in enumerate(frames[:target_min + 1]):
         is_recent = f_idx >= max(0, target_min - 2)
         for event in f.get("events", []):
             etype = event.get("type")
             killer_team = event.get("killerTeamId", event.get("teamId", 0))
+            ts = event.get("timestamp", 0) / 1000
 
             if etype == "CHAMPION_KILL":
                 killer_id = event.get("killerId", 0)
@@ -110,16 +115,15 @@ def _extract_snapshot(frames: list[dict], target_min: int) -> dict | None:
                         first_blood = 1
                 elif killer_id in RED_IDS:
                     red["kills"] += 1
+                    if is_recent:
+                        kills_red_recent += 1
                     if first_blood == 0:
                         first_blood = -1
-                if victim_id in BLUE_IDS:
-                    blue["deaths"] += 1
-                elif victim_id in RED_IDS:
-                    red["deaths"] += 1
+                if victim_id:
+                    last_death_ts[victim_id] = ts
 
             elif etype == "BUILDING_KILL":
                 # BUILDING_KILL: teamId = owner of the destroyed building (not the killer).
-                # teamId=100 → blue's building was killed by red → red team scores.
                 btype = event.get("buildingType", "")
                 if btype == "INHIBITOR_BUILDING":
                     if killer_team == 100:
@@ -135,136 +139,92 @@ def _extract_snapshot(frames: list[dict], target_min: int) -> dict | None:
                     else:
                         towers_blue += 1
 
+            elif etype == "TURRET_PLATE_DESTROYED":
+                if event.get("teamId", 0) == 100:
+                    plates_red += 1
+                else:
+                    plates_blue += 1
+
             elif etype == "ELITE_MONSTER_KILL":
                 monster = event.get("monsterType", "")
                 subtype = event.get("monsterSubType", "")
-
                 if monster == "DRAGON":
-                    if killer_team == 100:
+                    if subtype == "ELDER_DRAGON":
+                        last_elder_ts = ts
+                        last_elder_team = killer_team
+                    elif killer_team == 100:
                         dragons_blue += 1
                     else:
                         dragons_red += 1
-                    if subtype == "FIRE_DRAGON":
-                        if killer_team == 100:
-                            infernal_blue += 1
-                        else:
-                            infernal_red += 1
-                    elif subtype == "WATER_DRAGON":
-                        if killer_team == 100:
-                            ocean_blue += 1
-                        else:
-                            ocean_red += 1
-                    elif subtype == "EARTH_DRAGON":
-                        if killer_team == 100:
-                            mountain_blue += 1
-                        else:
-                            mountain_red += 1
-                    elif subtype == "AIR_DRAGON":
-                        if killer_team == 100:
-                            cloud_blue += 1
-                        else:
-                            cloud_red += 1
-                    elif subtype == "CHEMTECH_DRAGON":
-                        if killer_team == 100:
-                            chemtech_blue += 1
-                        else:
-                            chemtech_red += 1
-                    elif subtype == "HEXTECH_DRAGON":
-                        if killer_team == 100:
-                            hextech_blue += 1
-                        else:
-                            hextech_red += 1
-                    elif subtype == "ELDER_DRAGON":
-                        elder_kill_frame = f_idx
-                        elder_active_team = killer_team
-
                 elif monster == "BARON_NASHOR":
+                    last_baron_ts = ts
+                    last_baron_team = killer_team
                     if killer_team == 100:
                         barons_blue += 1
                     else:
                         barons_red += 1
-
                 elif monster == "RIFTHERALD":
                     if killer_team == 100:
                         heralds_blue += 1
                     else:
                         heralds_red += 1
-
-                elif monster == "HORDE":  # Void Grubs (Season 14+)
+                elif monster == "HORDE":  # Void Grubs
                     if killer_team == 100:
                         void_grubs_blue += 1
                     else:
                         void_grubs_red += 1
 
-            elif etype == "WARD_PLACED":
-                creator = event.get("creatorId", 0)
-                if creator in BLUE_IDS:
-                    wards_blue += 1
-                elif creator in RED_IDS:
-                    wards_red += 1
+    # Buffs épiques encore actifs à l'instant du snapshot.
+    baron_active = 0
+    if target_sec - last_baron_ts < BARON_BUFF_SEC:
+        baron_active = 1 if last_baron_team == 100 else -1
+    elder_active = 0
+    if target_sec - last_elder_ts < ELDER_BUFF_SEC:
+        elder_active = 1 if last_elder_team == 100 else -1
 
-            elif etype == "TURRET_PLATE_DESTROYED":
-                plate_team = event.get("teamId", 0)
-                if plate_team == 100:
-                    plates_red += 1
-                else:
-                    plates_blue += 1
+    # Soul au 4e dragon (dérivé du compte, l'event DRAGON_SOUL_GIVEN a teamId=0).
+    dragon_soul = 1 if dragons_blue >= 4 else (-1 if dragons_red >= 4 else 0)
 
-            elif etype == "DRAGON_SOUL_GIVEN":
-                soul_team = event.get("teamId", 0)
-                if soul_team == 100:
-                    dragon_soul = 1
-                else:
-                    dragon_soul = -1
+    # Joueurs vivants : un pid est mort si son dernier décès est plus récent
+    # que son temps de réapparition estimé (niveau + temps de jeu).
+    blue_alive = sum(
+        1 for pid in BLUE_IDS
+        if not is_dead(target_sec, last_death_ts.get(pid), level_by_pid.get(pid, 1), target_min)
+    )
+    red_alive = sum(
+        1 for pid in RED_IDS
+        if not is_dead(target_sec, last_death_ts.get(pid), level_by_pid.get(pid, 1), target_min)
+    )
 
-            elif etype == "ITEM_PURCHASED":
-                pid = event.get("participantId", 0)
-                item_id = event.get("itemId", 0)
-                if item_id in POWERSPIKE_ITEMS:
-                    if pid in BLUE_IDS:
-                        powerspike_blue += 1
-                    elif pid in RED_IDS:
-                        powerspike_red += 1
-
-    # Elder buff dure ~3 minutes (3 frames)
-    if elder_kill_frame >= 0 and target_min - elder_kill_frame <= 3:
-        elder_active = 1 if elder_active_team == 100 else -1
-    else:
-        elder_active = 0
+    # Momentum : pente du gold_diff sur la fenêtre glissante.
+    gold_diff_now = blue["gold"] - red["gold"]
+    prev_idx = max(0, target_min - SLOPE_WINDOW)
+    gb, gr = _team_gold_at(frames, prev_idx)
+    gold_slope = (gold_diff_now - (gb - gr)) / max(1, target_min - prev_idx)
 
     return {
-        "kills_diff": blue["kills"] - red["kills"],
-        "deaths_diff": blue["deaths"] - red["deaths"],
-        "cs_diff": blue["cs"] - red["cs"],
-        "gold_diff": blue["gold"] - red["gold"],
+        "gold_diff": gold_diff_now,
+        "gold_slope": gold_slope,
+        "current_gold_diff": blue["current_gold"] - red["current_gold"],
         "level_diff": blue["level"] - red["level"],
+        "cs_diff": blue["cs"] - red["cs"],
+        "kills_diff": blue["kills"] - red["kills"],
+        "kills_last_3min": kills_blue_recent - kills_red_recent,
+        "damage_diff": blue["damage"] - red["damage"],
+        "players_alive_diff": blue_alive - red_alive,
+        "first_blood": first_blood,
         "towers_diff": towers_blue - towers_red,
+        "plates_diff": plates_blue - plates_red,
+        "inhibitors_diff": inhibitors_blue - inhibitors_red,
+        "first_tower": first_tower,
         "dragons_diff": dragons_blue - dragons_red,
+        "dragon_soul": dragon_soul,
         "heralds_diff": heralds_blue - heralds_red,
         "barons_diff": barons_blue - barons_red,
-        "kills_last_3min": kills_blue_recent,
-        "game_time_minutes": target_min,
-        "wards_diff": wards_blue - wards_red,
-        "inhibitors_diff": inhibitors_blue - inhibitors_red,
-        "damage_diff": blue["damage"] - red["damage"],
-        "first_blood": first_blood,
-        "xp_diff": blue["xp"] - red["xp"],
-        "plates_diff": plates_blue - plates_red,
-        "current_gold_diff": blue["current_gold"] - red["current_gold"],
-        "dragon_soul": dragon_soul,
-        "cc_diff": blue["cc"] - red["cc"],
-        # v4 features
-        "void_grubs_diff": void_grubs_blue - void_grubs_red,
-        "first_tower": first_tower,
-        "infernal_diff": infernal_blue - infernal_red,
-        "ocean_diff": ocean_blue - ocean_red,
+        "baron_active": baron_active,
         "elder_active": elder_active,
-        "powerspike_diff": powerspike_blue - powerspike_red,
-        # v5 features
-        "mountain_diff": mountain_blue - mountain_red,
-        "cloud_diff": cloud_blue - cloud_red,
-        "chemtech_diff": chemtech_blue - chemtech_red,
-        "hextech_diff": hextech_blue - hextech_red,
+        "void_grubs_diff": void_grubs_blue - void_grubs_red,
+        "game_time_minutes": target_min,
     }
 
 
@@ -290,6 +250,11 @@ def parse_all(output_file: str = "data/processed/features.parquet") -> pd.DataFr
         if winner is None:
             continue
 
+        meta = _match_meta(info)
+        # Remakes / parties avortees : moins de 15 min => pas exploitable.
+        if 0 < meta["game_duration"] < 15 * 60:
+            continue
+
         frames = timeline.get("info", {}).get("frames", [])
 
         for snap_min in SNAPSHOT_MINUTES:
@@ -298,6 +263,8 @@ def parse_all(output_file: str = "data/processed/features.parquet") -> pd.DataFr
                 continue
             snap[TARGET_COL] = int(winner)
             snap["match_id"] = match_id
+            snap["game_creation"] = meta["game_creation"]
+            snap["game_version"] = meta["game_version"]
             rows.append(snap)
 
     df = pd.DataFrame(rows)

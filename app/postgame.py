@@ -21,7 +21,7 @@ from src.data.fetch_player import (
     get_puuid,
     get_recent_matches,
 )
-from src.models.predict import predict_win_probability
+from src.models.predict import predict_win_probability, smooth_probabilities
 
 st.set_page_config(
     page_title="LoL Post-Game Analyzer",
@@ -148,9 +148,9 @@ with col_detail:
     for snap in features:
         if snap["minute"] < 3:
             continue
-        p = predict_win_probability(snap)
-        probas_blue.append(p)
+        probas_blue.append(predict_win_probability(snap))
         minutes.append(snap["minute"])
+    probas_blue = smooth_probabilities(probas_blue)
 
     # Convertir en win proba du joueur
     if player_team == "blue":

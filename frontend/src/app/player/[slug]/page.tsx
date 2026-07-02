@@ -1,16 +1,11 @@
 "use client";
 import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, TrendingDown, TrendingUp, Minus, AlertTriangle, Flame, Zap } from "lucide-react";
-import { GameCard } from "@/components/GameCard";
+import { ArrowLeft, Loader2, TrendingDown, TrendingUp, Minus, AlertTriangle, Flame } from "lucide-react";
+import { GameCard, type Game } from "@/components/GameCard";
 import { initDDragon } from "@/lib/ddragon";
 
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-
-interface Game {
-  match_id: string; champion: string; kills: number; deaths: number;
-  assists: number; won: boolean; duration_min: number; player_team: string;
-}
 
 interface TiltData {
   streak: { type: "win" | "loss"; count: number };
@@ -65,7 +60,7 @@ function TiltTracker({ games }: { games: Game[] }) {
   const kdaColor = kdaDelta > 0.2 ? "var(--blue)" : kdaDelta < -0.2 ? "var(--red)" : "var(--muted)";
 
   return (
-    <div className="mb-5 space-y-2">
+    <div className="mb-8 space-y-3">
       {/* Alerte tilt */}
       {isTilting && (
         <div className="rounded-xl px-4 py-3 flex items-center gap-3"
@@ -88,56 +83,54 @@ function TiltTracker({ games }: { games: Game[] }) {
           style={{ background: "rgba(11,196,227,0.08)", border: "1px solid rgba(11,196,227,0.25)" }}>
           <Flame size={15} style={{ color: "var(--blue)", flexShrink: 0 }} />
           <p className="text-sm font-bold" style={{ color: "var(--blue)" }}>
-            {streak.count} victoires d'affilée — keep going
+            {streak.count} victoires d&apos;affilée — keep going
           </p>
         </div>
       )}
 
       {/* Stats row */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-3">
         {/* Streak */}
-        <div className="card-shine rounded-xl p-3 text-center"
+        <div className="card-shine rounded-xl p-5 text-center"
           style={{ border: `1px solid ${streakBorder}`, background: streakBg }}>
-          <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>Streak</p>
-          <p className="text-xl font-black" style={{ color: streakColor }}>
+          <p className="text-sm mb-1.5" style={{ color: "var(--muted)" }}>Streak</p>
+          <p className="text-3xl font-black" style={{ color: streakColor }}>
             {streak.count}{streak.type === "win" ? "V" : "D"}
           </p>
-          <p className="text-xs" style={{ color: streakColor }}>
-            {streak.type === "win" ? "consécutives" : "consécutives"}
-          </p>
+          <p className="text-sm mt-1" style={{ color: streakColor }}>consécutives</p>
         </div>
 
         {/* KDA récent */}
-        <div className="card-shine rounded-xl p-3 text-center">
-          <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>KDA (5 dern.)</p>
-          <p className="text-xl font-black" style={{ color: "var(--gold)" }}>
+        <div className="card-shine rounded-xl p-5 text-center">
+          <p className="text-sm mb-1.5" style={{ color: "var(--muted)" }}>KDA (5 dern.)</p>
+          <p className="text-3xl font-black" style={{ color: "var(--gold)" }}>
             {recentKda.toFixed(2)}
           </p>
-          <div className="flex items-center justify-center gap-1 mt-0.5">
-            <KdaIcon size={11} style={{ color: kdaColor }} />
-            <p className="text-xs" style={{ color: kdaColor }}>
+          <div className="flex items-center justify-center gap-1 mt-1">
+            <KdaIcon size={13} style={{ color: kdaColor }} />
+            <p className="text-sm" style={{ color: kdaColor }}>
               {kdaDelta >= 0 ? "+" : ""}{kdaDelta.toFixed(2)}
             </p>
           </div>
         </div>
 
         {/* Indicateur forme */}
-        <div className="card-shine rounded-xl p-3 text-center">
-          <p className="text-xs mb-1" style={{ color: "var(--muted)" }}>Forme</p>
+        <div className="card-shine rounded-xl p-5 text-center">
+          <p className="text-sm mb-1.5" style={{ color: "var(--muted)" }}>Forme</p>
           {isTilting ? (
             <>
-              <p className="text-xl font-black" style={{ color: "var(--red)" }}>Tilt</p>
-              <p className="text-xs" style={{ color: "var(--red)" }}>Break conseillé</p>
+              <p className="text-3xl font-black" style={{ color: "var(--red)" }}>Tilt</p>
+              <p className="text-sm mt-1" style={{ color: "var(--red)" }}>Break conseillé</p>
             </>
           ) : isStreaking ? (
             <>
-              <p className="text-xl font-black" style={{ color: "var(--blue)" }}>Hot</p>
-              <p className="text-xs" style={{ color: "var(--blue)" }}>Profites-en</p>
+              <p className="text-3xl font-black" style={{ color: "var(--blue)" }}>Hot</p>
+              <p className="text-sm mt-1" style={{ color: "var(--blue)" }}>Profites-en</p>
             </>
           ) : (
             <>
-              <p className="text-xl font-black" style={{ color: "var(--muted)" }}>Ok</p>
-              <p className="text-xs" style={{ color: "var(--muted)" }}>Neutre</p>
+              <p className="text-3xl font-black" style={{ color: "var(--muted)" }}>Ok</p>
+              <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>Neutre</p>
             </>
           )}
         </div>
@@ -179,24 +172,24 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
   const losses = games.length - wins;
 
   return (
-    <main className="min-h-screen px-4 py-10 max-w-xl mx-auto">
+    <main className="min-h-screen px-6 md:px-12 lg:px-20 py-12">
       <button onClick={() => router.push("/")}
         className="flex items-center gap-2 text-sm mb-8 opacity-50 hover:opacity-100 transition-opacity"
         style={{ color: "var(--gold)" }}>
         <ArrowLeft size={14} /> Retour
       </button>
 
-      <div className="mb-6">
+      <div className="mb-8">
         <p className="text-xs tracking-widest uppercase mb-1" style={{ color: "var(--gold-dim)" }}>Joueur</p>
-        <h1 className="text-4xl font-black text-gold-gradient">{riotId}</h1>
+        <h1 className="text-5xl font-black text-gold-gradient">{riotId}</h1>
         {!loading && !error && games.length > 0 && (
-          <div className="flex items-center gap-3 mt-2">
-            <span className="text-sm" style={{ color: "var(--muted)" }}>
+          <div className="flex items-center gap-3 mt-3">
+            <span className="text-base" style={{ color: "var(--muted)" }}>
               {games.length} parties récentes
             </span>
-            <span className="text-sm font-semibold" style={{ color: "var(--blue)" }}>{wins}V</span>
-            <span className="text-sm font-semibold" style={{ color: "var(--red)" }}>{losses}D</span>
-            <span className="text-sm" style={{ color: "var(--muted)" }}>
+            <span className="text-base font-semibold" style={{ color: "var(--blue)" }}>{wins}V</span>
+            <span className="text-base font-semibold" style={{ color: "var(--red)" }}>{losses}D</span>
+            <span className="text-base" style={{ color: "var(--muted)" }}>
               — {Math.round(wins / games.length * 100)}% WR
             </span>
           </div>
@@ -218,7 +211,7 @@ export default function PlayerPage({ params }: { params: Promise<{ slug: string 
 
       {!loading && !error && games.length > 0 && <TiltTracker games={games} />}
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         {games.map(g => (
           <GameCard
             key={g.match_id}

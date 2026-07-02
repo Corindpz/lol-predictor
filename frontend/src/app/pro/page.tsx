@@ -33,7 +33,7 @@ interface TournamentMatch {
 
 interface DatasetStats {
   [minute: number]: {
-    gold_per_player: number; cs_per_player: number; wards_diff_avg: number;
+    gold_per_player: number; cs_per_player: number; players_alive_avg: number;
     damage_diff_avg: number; kills_diff_avg: number; blue_winrate: number; n_games: number;
   };
 }
@@ -147,7 +147,7 @@ export default function ProPage() {
   ] : [];
 
   return (
-    <main className="min-h-screen px-4 py-10 max-w-4xl mx-auto">
+    <main className="min-h-screen px-6 md:px-12 lg:px-20 py-12">
       <button onClick={() => router.push("/")}
         className="flex items-center gap-2 text-sm mb-8 opacity-50 hover:opacity-100 transition-opacity"
         style={{ color: "var(--gold)" }}>

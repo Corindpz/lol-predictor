@@ -1,0 +1,31 @@
+{
+  "version": "20260702_212902",
+  "date": "2026-07-02T21:29:02.919458",
+  "git_sha": "584984f",
+  "feature_cols": [
+    "gold_diff",
+    "gold_slope",
+    "current_gold_diff",
+    "level_diff",
+    "cs_diff",
+    "kills_diff",
+    "kills_last_3min",
+    "damage_diff",
+    "players_alive_diff",
+    "first_blood",
+    "towers_diff",
+    "plates_diff",
+    "inhibitors_diff",
+    "first_tower",
+    "dragons_diff",
+    "dragon_soul",
+    "heralds_diff",
+    "barons_diff",
+    "baron_active",
+    "elder_active",
+    "void_grubs_diff",
+    "game_time_minutes"
+  ],
+  "n_features": 22,
+  "target": "blue_wins"
+}

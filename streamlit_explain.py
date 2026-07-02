@@ -107,22 +107,22 @@ Le modèle doit capter des dynamiques temporelles complexes.
 
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Matchs collectés", "9 773")
-    col2.metric("Snapshots", "41 111")
-    col3.metric("Features", "30")
-    col4.metric("AUC-ROC", "0.857")
+    col2.metric("Snapshots", "246 350")
+    col3.metric("Features", "22")
+    col4.metric("AUC-ROC", "0.835")
 
     st.markdown("---")
     st.subheader("Architecture du pipeline")
     st.code("""
-pull_matches.py     ← Riot API match-v5 (Master+ EUW, Silver→Challenger)
+pull_matches.py     ← Riot API match-v5 (ranked EUW, Silver→Challenger)
         ↓
-parse_timelines.py  ← Extract 26 features par snapshot (× 5 timestamps)
+parse_timelines.py  ← 22 features par snapshot (1 / minute, de la min 5 à 40)
         ↓
-features.parquet    ← 40 475 lignes × 28 colonnes
+features.parquet    ← 246 350 lignes (+ match_id, game_creation pour le split)
         ↓
-train.py            ← LogReg (baseline) + XGBoost + RandomizedSearchCV 40 iter
+train.py            ← LogReg (baseline) + XGBoost, split TEMPOREL groupé par match
         ↓
-xgboost_final.pkl   ← CalibratedClassifierCV (sigmoid) + TreeExplainer SHAP
+xgboost_final.pkl   ← CalibratedClassifierCV (isotonic) + TreeExplainer SHAP
         ↓
 FastAPI + Next.js   ← App web prédiction live + simulateur SHAP
 """, language="text")
@@ -236,91 +236,75 @@ Cela permet au modèle d'apprendre les asymétries dans une seule dimension.
 """)
 
     features = {
-        "v1 — Base": [
-            ("kills_diff", "Kills", "CHAMPION_KILL"),
-            ("deaths_diff", "Deaths", "CHAMPION_KILL (victimes)"),
-            ("cs_diff", "CS (ferme)", "participantFrames"),
-            ("gold_diff", "Gold total", "participantFrames.totalGold"),
-            ("level_diff", "Niveaux", "participantFrames.level"),
-            ("towers_diff", "Tours détruites", "BUILDING_KILL (TOWER)"),
-            ("dragons_diff", "Dragons", "ELITE_MONSTER_KILL"),
-            ("heralds_diff", "Rift Heralds", "ELITE_MONSTER_KILL"),
-            ("barons_diff", "Barons Nashor", "ELITE_MONSTER_KILL"),
-            ("kills_last_3min", "Kills récents (3 min)", "Fenêtre glissante"),
-            ("game_time_minutes", "Temps de jeu", "Index de frame"),
+        "Économie": [
+            ("gold_diff", "Écart d'or total", "participantFrames.totalGold"),
+            ("gold_slope", "Momentum d'or (pente sur 5 min)", "Dérivée du gold_diff"),
+            ("current_gold_diff", "Or non dépensé", "participantFrames.currentGold"),
+            ("level_diff", "Écart de niveaux", "participantFrames.level"),
+            ("cs_diff", "Écart de farm (CS)", "minions + monstres neutres"),
         ],
-        "v2 — Vision & Objectifs": [
-            ("wards_diff", "Wards posées", "WARD_PLACED"),
-            ("inhibitors_diff", "Inhibiteurs", "BUILDING_KILL (INHIB)"),
+        "Combat": [
+            ("kills_diff", "Écart de kills", "CHAMPION_KILL"),
+            ("kills_last_3min", "Momentum de kills (diff 3 min)", "Fenêtre glissante bleu − rouge"),
             ("damage_diff", "Dégâts aux champions", "damageStats.totalDamageDoneToChampions"),
+            ("players_alive_diff", "Joueurs vivants", "Death timers (respawn estimé par niveau)"),
             ("first_blood", "First Blood (+1/-1/0)", "Premier CHAMPION_KILL"),
         ],
-        "v3 — Économie & Combat": [
-            ("xp_diff", "XP total", "participantFrames.xp"),
+        "Structures": [
+            ("towers_diff", "Tours détruites", "BUILDING_KILL (TOWER)"),
             ("plates_diff", "Turret Plates", "TURRET_PLATE_DESTROYED"),
-            ("current_gold_diff", "Gold non dépensé", "participantFrames.currentGold"),
-            ("dragon_soul", "Dragon Soul (+1/-1/0)", "DRAGON_SOUL_GIVEN"),
-            ("cc_diff", "Contrôle (CC)", "timeEnemySpentControlled"),
-        ],
-        "v4 — Macro & Powerspikes": [
-            ("void_grubs_diff", "Void Grubs (S15+)", "ELITE_MONSTER_KILL (HORDE)"),
+            ("inhibitors_diff", "Inhibiteurs", "BUILDING_KILL (INHIB)"),
             ("first_tower", "Première tour (+1/-1/0)", "Premier BUILDING_KILL"),
-            ("infernal_diff", "Dragons Infernaux", "monsterSubType FIRE_DRAGON"),
-            ("ocean_diff", "Dragons Océan", "monsterSubType WATER_DRAGON"),
-            ("elder_active", "Buff Elder (±3 min)", "ELDER_DRAGON actif"),
-            ("powerspike_diff", "Items Powerspike", "ITEM_PURCHASED (8 items clés)"),
         ],
-        "v5 — Dragon Subtypes (S15 2026)": [
-            ("mountain_diff", "Dragons Montagne", "monsterSubType EARTH_DRAGON"),
-            ("cloud_diff", "Dragons Nuage", "monsterSubType AIR_DRAGON"),
-            ("chemtech_diff", "Dragons Chemtech", "monsterSubType CHEMTECH_DRAGON"),
-            ("hextech_diff", "Dragons Hextech", "monsterSubType HEXTECH_DRAGON"),
+        "Objectifs épiques": [
+            ("dragons_diff", "Dragons", "ELITE_MONSTER_KILL (DRAGON)"),
+            ("dragon_soul", "Dragon Soul (+1/-1/0)", "Dérivé du 4e dragon"),
+            ("heralds_diff", "Rift Heralds", "ELITE_MONSTER_KILL (RIFTHERALD)"),
+            ("barons_diff", "Barons Nashor", "ELITE_MONSTER_KILL (BARON)"),
+            ("baron_active", "Buff Baron actif (+1/-1/0)", "Baron pris < 3 min"),
+            ("elder_active", "Buff Elder actif (+1/-1/0)", "Elder pris < 2,5 min"),
+            ("void_grubs_diff", "Void Grubs", "ELITE_MONSTER_KILL (HORDE)"),
+        ],
+        "Temps": [
+            ("game_time_minutes", "Minute de jeu", "Index de frame"),
         ],
     }
 
     for version, feats in features.items():
-        with st.expander(f"**{version}** — {len(feats)} features", expanded=(version == "v5 — Dragon Subtypes (S15 2026)")):
+        with st.expander(f"**{version}** — {len(feats)} features", expanded=(version == "Objectifs épiques")):
             feat_df = pd.DataFrame(feats, columns=["Feature", "Description", "Source API"])
             st.dataframe(feat_df, use_container_width=True, hide_index=True)
 
     st.markdown("---")
     st.subheader("Snapshot à la minute 15 — exemple")
     st.code("""\
-# Snapshot minute 15 — equipe bleue dominante → blue_wins = 1
+# Snapshot minute 15 — equipe bleue en avance → blue_wins = 1
 {
-  "kills_diff": 3,
-  "deaths_diff": 2,
-  "cs_diff": 45,
   "gold_diff": 1800,
-  "level_diff": 2,
-  "towers_diff": -1,
-  "dragons_diff": 1,
-  "heralds_diff": 0,
-  "barons_diff": 0,
-  "kills_last_3min": 2,
-  "game_time_minutes": 15,
-  "wards_diff": 4,
-  "inhibitors_diff": 0,
-  "damage_diff": 12000,
-  "first_blood": 1,
-  "xp_diff": 1200,
-  "plates_diff": 2,
+  "gold_slope": 220,
   "current_gold_diff": 300,
-  "dragon_soul": 0,
-  "cc_diff": 2500,
-  "void_grubs_diff": 3,
+  "level_diff": 2,
+  "cs_diff": 45,
+  "kills_diff": 3,
+  "kills_last_3min": 1,
+  "damage_diff": 12000,
+  "players_alive_diff": 1,
+  "first_blood": 1,
+  "towers_diff": 1,
+  "plates_diff": 2,
+  "inhibitors_diff": 0,
   "first_tower": 1,
-  "infernal_diff": 1,
-  "ocean_diff": 0,
+  "dragons_diff": 1,
+  "dragon_soul": 0,
+  "heralds_diff": 1,
+  "barons_diff": 0,
+  "baron_active": 0,
   "elder_active": 0,
-  "powerspike_diff": 2,
-  "mountain_diff": 0,
-  "cloud_diff": 1,
-  "chemtech_diff": 0,
-  "hextech_diff": 0
+  "void_grubs_diff": 2,
+  "game_time_minutes": 15
 }
 """, language="python")
-    st.info("Note : `towers_diff` = tours détruites bleues − rouges (BUILDING_KILL teamId corrigé en v4.1 — valeur positive = avantage bleu)")
+    st.info("Note : toutes les features sont des différentiels bleu − rouge (positif = avantage bleu). `gold_slope` = pente du gold_diff sur 5 min (momentum), `players_alive_diff` = joueurs vivants estimés via les death timers.")
 
 # ════════════════════════════════════════════════════════════════════════════════
 # 3 · EDA
@@ -406,7 +390,7 @@ elif section == "4 · Modélisation":
 **XGBoost (calibré)**
 - Gradient boosting : combine des arbres faibles
 - Gère les interactions non-linéaires entre features
-- `CalibratedClassifierCV(method='sigmoid')` pour obtenir des probabilités calibrées
+- `CalibratedClassifierCV(method='isotonic')` pour obtenir des probabilités calibrées
 
 **Pourquoi calibrer ?**
 Sans calibration, les probabilités du modèle ne correspondent pas aux fréquences réelles.
@@ -416,33 +400,25 @@ Un modèle "sur-confiant" dit 90% quand c'est en réalité 75%.
     with col2:
         st.subheader("Pipeline d'entraînement")
         st.code("""
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.model_selection import StratifiedGroupKFold, RandomizedSearchCV
 from sklearn.calibration import CalibratedClassifierCV
+from sklearn.frozen import FrozenEstimator
 from xgboost import XGBClassifier
 
-X = df[FEATURE_COLS]
-y = df["blue_wins"]
+# Split TEMPOREL par partie : les parties récentes en test, aucune game
+# à cheval sur train/test -> pas de fuite entre snapshots d'un même match.
+train_df, test_df = temporal_group_split(df)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42, stratify=y
-)
-
-# 1. RandomizedSearchCV — 40 iterations, 5-fold CV
-param_dist = {
-    "n_estimators":    randint(200, 1000),
-    "max_depth":       randint(3, 7),
-    "learning_rate":   loguniform(0.005, 0.1),
-    "subsample":       uniform(0.7, 0.3),
-    "reg_alpha":       loguniform(0.01, 2.0),
-}
+# 1. RandomizedSearchCV avec CV GROUPÉE par match_id (anti-fuite)
+cv = StratifiedGroupKFold(n_splits=5, shuffle=True, random_state=42)
 search = RandomizedSearchCV(XGBClassifier(), param_dist, n_iter=40,
-                            scoring="roc_auc", cv=5, n_jobs=-1)
-search.fit(X_train, y_train)
+                            scoring="roc_auc", cv=cv, n_jobs=-1)
+search.fit(X_train, y_train, groups=train_df["match_id"])
 best_xgb = search.best_estimator_
 
-# 2. Calibration sigmoid
-model = CalibratedClassifierCV(best_xgb, method="sigmoid", cv=5)
-model.fit(X_train, y_train)
+# 2. Calibration isotonic sur un hold-out groupé (le sigmoid dégradait l'ECE)
+model = CalibratedClassifierCV(FrozenEstimator(best_xgb), method="isotonic")
+model.fit(X_calib, y_calib)
 """, language="python")
 
     st.markdown("---")
@@ -470,16 +446,17 @@ elif section == "5 · Résultats & SHAP":
     st.title("Résultats & Explainability SHAP")
 
     col1, col2, col3 = st.columns(3)
-    col1.metric("Accuracy XGBoost", "77.2%", "+0.6% vs LogReg")
-    col2.metric("AUC-ROC", "0.856", "Excellent (>0.85)")
-    col3.metric("Log-loss", "0.474", "Calibré")
+    col1.metric("Accuracy XGBoost", "74.9%", "≈ LogReg")
+    col2.metric("AUC-ROC", "0.835", "jusqu'à 0.91 en mid-game")
+    col3.metric("Brier / ECE", "0.166 / 0.027", "bien calibré")
 
     st.markdown("""
 ### Interprétation
 
-- **AUC-ROC 0.856** : le modèle distingue bien les gagnants des perdants. À 0.85+, il est utilisable en production.
-- **Accuracy 77.2%** : sur 100 snapshots, 77 predictions correctes. Pas 100% car LoL a une part d'aléatoire.
-- **LogReg vs XGBoost** : les performances sont très proches. Le gold_diff est si dominant que même la régression linéaire performe bien. XGBoost apporte la valeur sur les interactions (ex: void grubs × gold avance × early game).
+- **AUC-ROC 0.835** (split temporel groupé, sans fuite) : le modèle distingue bien les gagnants des perdants — et grimpe jusqu'à **0.91 à la minute 25**. Un chiffre honnête (une version fuitée annonçait 0.856).
+- **Accuracy 74.9%** en agrégé : forcément plus faible en early game (peu d'info) que vers la min 25. Précision qui monte avec le temps de jeu.
+- **Bien calibré** (Brier 0.166, ECE 0.027) : quand le modèle dit 80 %, c'est vrai ~8 fois sur 10.
+- **LogReg vs XGBoost** : très proches — `gold_diff` seul fait déjà AUC 0.821. XGBoost apporte la valeur sur les interactions et le momentum (pente d'or, joueurs vivants).
 """)
 
     st.markdown("---")
@@ -487,54 +464,39 @@ elif section == "5 · Résultats & SHAP":
     st.markdown("""
 SHAP (SHapley Additive exPlanations) décompose chaque prédiction en contributions par feature.
 
-**Exemple** : pour une game où blue win prob = 73%, SHAP montre :
-- `gold_diff` : +15% (avantage gold de 2000)
-- `infernal_diff` : +8% (2 infernaux vs 0)
-- `barons_diff` : +6% (baron nashor pris)
-- `cc_diff` : -2% (rouge a plus de CC)
+**Exemple** : pour une avance bleue nette à la minute 25 (blue win prob ≈ 91 %), SHAP montre :
+- `gold_diff` : le plus fort contributeur (avance d'or)
+- `dragons_diff` : bonus objectifs
+- `level_diff` / `gold_slope` : avance d'XP et momentum positif
 """)
 
     if DATA_OK:
         try:
-            import shap
-            base = model.calibrated_classifiers_[0].estimator
-            explainer = shap.TreeExplainer(base)
-            from src.features.build_features import FEATURE_COLS
+            from src.models.explain import explain_prediction
 
-            # Exemple de prédiction avec SHAP
+            # Exemple : avance bleue nette à la minute 25
             sample = {
-                "kills_diff": 5, "deaths_diff": 3, "cs_diff": 60,
-                "gold_diff": 2500, "level_diff": 3, "towers_diff": 2,
-                "dragons_diff": 2, "heralds_diff": 0, "barons_diff": 1,
-                "kills_last_3min": 3, "game_time_minutes": 25,
-                "wards_diff": 5, "inhibitors_diff": 0, "damage_diff": 18000,
-                "first_blood": 1, "xp_diff": 2000, "plates_diff": 2,
-                "current_gold_diff": 500, "dragon_soul": 0, "cc_diff": 3000,
-                "void_grubs_diff": 3, "first_tower": 1, "infernal_diff": 2,
-                "ocean_diff": 0, "elder_active": 0, "powerspike_diff": 3,
+                "gold_diff": 5000, "gold_slope": 700, "current_gold_diff": 400,
+                "level_diff": 5, "cs_diff": 60, "kills_diff": 7,
+                "kills_last_3min": 2, "damage_diff": 18000, "players_alive_diff": 2,
+                "first_blood": 1, "towers_diff": 4, "plates_diff": 2,
+                "inhibitors_diff": 0, "first_tower": 1, "dragons_diff": 2,
+                "dragon_soul": 0, "heralds_diff": 1, "barons_diff": 1,
+                "baron_active": 1, "elder_active": 0, "void_grubs_diff": 2,
+                "game_time_minutes": 25,
             }
-            X = pd.DataFrame([sample])[FEATURE_COLS]
-            sv = explainer.shap_values(X)
-            if isinstance(sv, list):
-                shap_vals = sv[1][0]
-            else:
-                shap_vals = sv[0]
-
-            base_log = np.log(0.5 / 0.5)
-            impacts = {f: float(1 / (1 + np.exp(-(base_log + s))) - 0.5) * 100
-                       for f, s in zip(FEATURE_COLS, shap_vals)}
-            impacts_sorted = sorted(impacts.items(), key=lambda x: abs(x[1]), reverse=True)[:10]
+            contribs = explain_prediction(sample, top_k=10)
 
             fig, ax = plt.subplots(figsize=(7, 4), facecolor="#0d1117")
             ax.set_facecolor("#0d1117")
-            names = [k for k, _ in impacts_sorted]
-            vals  = [v for _, v in impacts_sorted]
+            names = [c["label"] for c in contribs][::-1]
+            vals  = [c["contribution"] for c in contribs][::-1]
             colors_bar = ["#0bc4e3" if v > 0 else "#e84057" for v in vals]
-            ax.barh(names[::-1], vals[::-1], color=colors_bar[::-1], alpha=0.85)
+            ax.barh(names, vals, color=colors_bar, alpha=0.85)
             ax.axvline(0, color=(1, 1, 1, 0.2))
-            ax.set_xlabel("Delta probabilité (SHAP)", color="#e8e0d0")
+            ax.set_xlabel("Contribution SHAP (log-odds, + = équipe bleue)", color="#e8e0d0")
             ax.tick_params(colors="#e8e0d0")
-            ax.set_title("Impact SHAP — exemple game à 25 min (blue dominant)", color="#c89b3c")
+            ax.set_title("Impact SHAP — exemple game à 25 min (avance bleue)", color="#c89b3c")
             for spine in ax.spines.values():
                 spine.set_edgecolor("#1e2a3a")
             st.pyplot(fig)

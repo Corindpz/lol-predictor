@@ -199,7 +199,7 @@ export default function DraftPage() {
   const probColor = prob > 60 ? "var(--blue)" : prob < 40 ? "var(--red)" : "var(--gold)";
 
   return (
-    <main className="min-h-screen px-4 py-10 max-w-3xl mx-auto">
+    <main className="min-h-screen px-6 md:px-12 lg:px-20 py-12">
       <button onClick={() => router.push("/")}
         className="flex items-center gap-2 text-sm mb-8 opacity-50 hover:opacity-100 transition-opacity"
         style={{ color: "var(--gold)" }}>

@@ -28,9 +28,9 @@ Ce n'est pas juste un projet ML — c'est une question de storytelling sportif.
 
 ## Slide 2 — Les données (2 min)
 
-- Source 1 : Riot API `match-v5` — matchs Master+ EUW
+- Source 1 : Riot API `match-v5` — ranked solo EUW, **Silver → Challenger**
 - Source 2 : Live Client API locale `127.0.0.1:2999`
-- Volume : **N matchs** × 5 snapshots = **N×5 lignes** *(à compléter après pull)*
+- Volume : **9 773 matchs** → **246 350 snapshots** (1 par minute, de la min 5 à 40)
 - Qualité : uniquement ranked solo > 15 min (pas de surrenders/remakes)
 
 **Screenshot à insérer :** `screenshots/data_pull_terminal.png` *(tqdm progress bar)*  
@@ -46,13 +46,16 @@ Pourquoi des **différentiels** plutôt que des valeurs absolues ?
 
 | Feature | Justification |
 |---------|--------------|
-| `gold_diff` | Proxy économique le plus robuste |
+| `gold_diff` | Proxy économique le plus robuste (AUC 0,821 à lui seul) |
+| `gold_slope` | Momentum économique — pente d'or sur 5 min (capte les comebacks) |
+| `players_alive_diff` | Joueurs vivants — un 4v5 en late décide la partie |
 | `kills_diff` | Avantage combat direct |
-| `cs_diff` | Farm = économie passive |
 | `towers_diff` | Contrôle de carte |
-| `dragons_diff` | Objectifs long-terme |
-| `kills_last_3min` | Momentum récent |
+| `dragons_diff` / `dragon_soul` | Objectifs long-terme |
+| `baron_active` | Buff baron actif (≠ baron cumulé) |
 | `game_time_minutes` | Contexte temporel |
+
+*22 features au total, toutes des différentiels bleu − rouge.*
 
 **Screenshot à insérer :** `screenshots/feature_distributions.png` *(histogrammes EDA)*
 
@@ -65,13 +68,14 @@ Deux modèles, approche comparative :
 **Logistic Regression (baseline)**
 - Simple, interprétable, rapide
 - Coefficients = importance directe des features
-- AUC : *à compléter*
+- AUC : **0,834**
 
 **XGBoost (modèle final)**
 - Gradient boosting, idéal sur données tabulaires
 - Gère les interactions entre features automatiquement
-- Calibré avec `CalibratedClassifierCV(isotonic)` pour des probabilités fiables
-- AUC : *à compléter*
+- Calibré avec `CalibratedClassifierCV(isotonic)` pour des probabilités fiables (ECE 0,03)
+- AUC : **0,835** (jusqu'à **0,91** en milieu de partie) · accuracy 74,9 % · Brier 0,166
+- Split **temporel par partie** (pas de fuite entre snapshots d'une même game)
 
 **Screenshot à insérer :** `screenshots/roc_curves.png`  
 **Screenshot à insérer :** `screenshots/calibration_curve.png`  
@@ -83,7 +87,7 @@ Deux modèles, approche comparative :
 
 > "À quelle minute la partie est-elle statistiquement pliée ?"
 
-Graphique : AUC-ROC par tranche de temps (10 / 15 / 20 / 25 / 30 min)
+Graphique : AUC-ROC par minute de jeu — **0,76 à 10 min → 0,91 à 25 min**
 
 → Montre que le modèle devient plus confiant avec le temps de jeu  
 → Identifie les **points de bascule** (Baron, Dragon Soul, inhibiteur)
@@ -109,7 +113,7 @@ Graphique : AUC-ROC par tranche de temps (10 / 15 / 20 / 25 / 30 min)
 ## Slide 7 — Limites & perspectives (2 min)
 
 **Limites honnêtes :**
-- Données Master+ → biais sur les parties normales/gold
+- Données EUW uniquement (Silver→Challenger) → biais régional, pas de KR/NA
 - Gold live estimé (Live Client API ne donne pas le total exact)
 - Pas de features individuelles (rôle, champion, build) — cohérence train/live
 - Modèle statique : pas de retrain automatique sur les patchs
